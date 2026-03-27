@@ -23,38 +23,38 @@ const Contact = () => {
               <p style={{ color: 'var(--text-muted)', marginBottom: '40px', lineHeight: '1.6' }}>
                 Our support team is available 24/7 to assist you. Drop us a message or visit our headquarters.
               </p>
-              
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
                 <div style={{ backgroundColor: 'rgba(250, 204, 21, 0.2)', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <MapPin size={24} color="var(--primary)" />
                 </div>
                 <div>
                   <h4 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Headquarters</h4>
-                  <p style={{ color: 'var(--text-muted)' }}>123 Innovation Drive, Tech Park, City 40001</p>
+                  <p style={{ color: 'var(--text-muted)' }}>Gamma 2, Greater Noida, Uttar Pradesh 201310</p>
                 </div>
               </div>
-              
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
                 <div style={{ backgroundColor: 'rgba(250, 204, 21, 0.2)', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Phone size={24} color="var(--primary)" />
                 </div>
                 <div>
                   <h4 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Phone Support</h4>
-                  <p style={{ color: 'var(--text-muted)' }}>+1 (800) 123-4567<br/>Mon-Sun: 24/7 Support</p>
+                  <p style={{ color: 'var(--text-muted)' }}>+91-987654321<br />24/7 Support</p>
                 </div>
               </div>
-              
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                 <div style={{ backgroundColor: 'rgba(250, 204, 21, 0.2)', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Mail size={24} color="var(--primary)" />
                 </div>
                 <div>
                   <h4 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Email Us</h4>
-                  <p style={{ color: 'var(--text-muted)' }}>support@tripzo.com<br/>partnerships@tripzo.com</p>
+                  <p style={{ color: 'var(--text-muted)' }}>support@tripzo.com<br />partnerships@tripzo.com</p>
                 </div>
               </div>
             </div>
-            
+
             {/* Contact Form */}
             <div className="glass-panel" style={{ padding: '40px' }}>
               <h3 style={{ fontSize: '1.5rem', marginBottom: '24px' }}>Send a Message</h3>
