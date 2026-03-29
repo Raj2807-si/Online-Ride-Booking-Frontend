@@ -40,38 +40,44 @@ const Map = ({ pickup, destination }) => {
     }
   }, [isLoaded, pickup, destination]);
 
+  const mapStyles = [
+    { elementType: "geometry", stylers: [{ color: "#212121" }] },
+    { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#3c3c3c" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] },
+  ];
+
   if (!isLoaded) return <div className="glass-panel" style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>Loading Maps...</div>;
 
   return (
     <GoogleMap
       mapContainerStyle={mapContainerStyle}
       center={defaultCenter}
-      zoom={13}
+      zoom={14}
       options={{
+        styles: mapStyles,
         disableDefaultUI: true,
-        styles: [
-            {
-              "elementType": "geometry",
-              "stylers": [{ "color": "#212121" }]
-            },
-            {
-              "elementType": "labels.icon",
-              "stylers": [{ "visibility": "off" }]
-            },
-            {
-              "elementType": "labels.text.fill",
-              "stylers": [{ "color": "#757575" }]
-            },
-            {
-                "featureType": "road",
-                "elementType": "geometry",
-                "stylers": [{ "color": "#303030" }]
-            }
-        ]
+        zoomControl: true,
       }}
     >
-      {directions && <DirectionsRenderer directions={directions} options={{ suppressMarkers: false }} />}
-      {!directions && pickup && <Marker position={defaultCenter} label="P" />}
+      {directions && (
+        <DirectionsRenderer 
+            directions={directions} 
+            options={{ 
+                suppressMarkers: false,
+                polylineOptions: {
+                    strokeColor: "#4f46e5",
+                    strokeWeight: 5,
+                    strokeOpacity: 0.8
+                }
+            }} 
+        />
+      )}
+      
+      {/* If no directions, show single marker at center/pickup if possible */}
+      {!directions && <Marker position={defaultCenter} icon={{ url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png" }} />}
     </GoogleMap>
   );
 };

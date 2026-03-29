@@ -1,17 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import Map from '../components/Map';
-import { LogOut, Power } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, MapPin, Settings, Bell, Power, Navigation2 } from 'lucide-react';
+import { 
+  ResponsiveContainer, 
+  AreaChart, 
+  Area,
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip 
+} from 'recharts';
+
+const data = [
+  { name: 'Mon', earnings: 450 },
+  { name: 'Tue', earnings: 780 },
+  { name: 'Wed', earnings: 520 },
+  { name: 'Thu', earnings: 900 },
+  { name: 'Fri', earnings: 1100 },
+  { name: 'Sat', earnings: 1450 },
+  { name: 'Sun', earnings: 1200 },
+];
 
 const DriverDashboard = () => {
-  const [isOnline, setIsOnline] = useState(false);
-  const [activeRequest, setActiveRequest] = useState(null);
-  const [socket, setSocket] = useState(null);
+  const { user, token, role } = useAuth();
   const navigate = useNavigate();
-  const { token, role } = useAuth();
+  const [activeRide, setActiveRide] = useState(null);
+  const [newRide, setNewRide] = useState(null);
+  const [earnings, setEarnings] = useState(0);
+  const [isOnline, setIsOnline] = useState(false);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
     if (!token || role !== 'driver') {
@@ -19,118 +39,180 @@ const DriverDashboard = () => {
       return;
     }
 
-    const newSocket = io('http://localhost:5000', {
-       auth: { token }
-    });
+    const fetchEarnings = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/drivers/earnings', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setEarnings(response.data.earnings);
+      } catch (err) { console.error('Error fetching earnings', err); }
+    };
+    fetchEarnings();
+
+    const newSocket = io('http://localhost:5000', { auth: { token } });
     setSocket(newSocket);
 
     newSocket.on('new_ride_request', (ride) => {
-       if (isOnline) {
-         setActiveRequest(ride);
-       }
+        if (!activeRide) setNewRide(ride);
     });
 
     return () => newSocket.disconnect();
-  }, [navigate, isOnline]);
+  }, [token, role, navigate, activeRide]);
 
-  const toggleStatus = () => {
-    setIsOnline(!isOnline);
-    if (!isOnline) {
-      // Simulate receiving a request soon after going online
-      setTimeout(() => {
-        setActiveRequest({
-          _id: 'RIDE123',
-          pickup: 'Connaught Place',
-          destination: 'India Gate',
-          fare: 150,
-          distance: '3 km'
+  const handleToggleStatus = async () => {
+    try {
+        const nextStatus = isOnline ? 'inactive' : 'active';
+        await axios.post('http://localhost:5000/api/drivers/toggle-status', { status: nextStatus }, {
+            headers: { Authorization: `Bearer ${token}` }
         });
-      }, 3000);
-    } else {
-      setActiveRequest(null);
-    }
+        setIsOnline(!isOnline);
+    } catch (err) { alert('Error updating status'); }
   };
 
-  const acceptRide = async () => {
+  const handleAcceptRide = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/rides/accept/${activeRequest._id || activeRequest.id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      alert(`Ride accepted! Navigation started.`);
-      setActiveRequest(null);
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Error accepting ride (is MongoDB running?)');
-      setActiveRequest(null);
-    }
+        const response = await axios.post(`http://localhost:5000/api/rides/accept/${newRide._id}`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        setActiveRide(response.data);
+        setNewRide(null);
+    } catch (err) { alert(err.response?.data?.message || 'Error accepting ride'); }
+  };
+
+  const handleCompleteRide = async () => {
+    try {
+        await axios.post(`http://localhost:5000/api/rides/complete/${activeRide._id}`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        setActiveRide(null);
+        alert('Ride completed & earnings credited!');
+        // Refresh earnings
+        const res = await axios.get('http://localhost:5000/api/drivers/earnings', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        setEarnings(res.data.earnings);
+    } catch (err) { alert('Error completing ride'); }
   };
 
   return (
-    <div className="map-container">
-      {/* Admin/online Header */}
-      <div style={{ position: 'absolute', top: 20, left: 20, right: 20, zIndex: 1000, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ color: 'var(--primary)', textShadow: '0 2px 4px rgba(0,0,0,0.5)', fontSize: '1.5rem', fontWeight: 'bold' }}>Tripzo Captain</h1>
-        <button onClick={() => navigate('/login')} className="glass-panel" style={{ border: 'none', padding: '8px 12px', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <LogOut size={18} /> Logout
-        </button>
-      </div>
+    <div className="dashboard-container">
+      {/* Sidebar */}
+      <div className="sidebar glass-panel">
+        <div className="logo" style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '40px' }}>Tripzo</div>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="nav-item active"><LayoutDashboard size={20} /> Dashboard</div>
+          <div className="nav-item"><MapPin size={20} /> Today's Rides</div>
+          <div className="nav-item"><Settings size={20} /> Settings</div>
+        </nav>
 
-      <Map />
-      
-      {/* Online Toggle */}
-      <div style={{ position: 'absolute', top: 80, right: 20, zIndex: 1000 }}>
-        <button 
-          onClick={toggleStatus}
-          className="glass-panel"
-          style={{
-            padding: '12px 20px',
-            border: `2px solid ${isOnline ? 'var(--success)' : 'var(--danger)'}`,
-            borderRadius: '24px',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            cursor: 'pointer',
-            backgroundColor: isOnline ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-            fontWeight: 'bold'
-          }}
-        >
-          <Power size={18} color={isOnline ? 'var(--success)' : 'var(--danger)'} />
-          {isOnline ? 'ONLINE' : 'OFFLINE'}
-        </button>
-      </div>
-
-      {/* Ride Request Panel */}
-      {activeRequest && (
-        <div className="booking-panel glass-panel" style={{ border: '2px solid var(--primary)' }}>
-          <h3 style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px', marginBottom: '15px' }}>
-            New Ride Request
-          </h3>
-          <div style={{ marginBottom: '12px' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Pickup</p>
-            <p style={{ fontWeight: '600' }}>{activeRequest.pickup}</p>
-          </div>
-          <div style={{ marginBottom: '16px' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Drop-off</p>
-            <p style={{ fontWeight: '600' }}>{activeRequest.destination}</p>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Fare</p>
-              <p style={{ fontWeight: 'bold', color: 'var(--primary)', fontSize: '1.1rem' }}>₹{activeRequest.fare}</p>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Est. Distance</p>
-              <p style={{ fontWeight: '600' }}>{activeRequest.distance}</p>
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="btn-primary" style={{ flex: 1 }} onClick={acceptRide}>Accept</button>
-            <button className="btn-primary" style={{ flex: 1, backgroundColor: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)' }} onClick={() => setActiveRequest(null)}>Ignore</button>
-          </div>
+        <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+           <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{user?.fullname?.[0]}</div>
+           <div>
+             <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{user?.fullname || 'Driver'}</div>
+             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{isOnline ? 'Online' : 'Offline'}</div>
+           </div>
         </div>
-      )}
+      </div>
+
+      {/* Main Content */}
+      <div className="main-content">
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '1.75rem' }}>Welcome back, {user?.fullname?.split(' ')[0]}!</h2>
+          <div style={{ display: 'flex', gap: '15px' }}>
+            <button 
+                onClick={handleToggleStatus}
+                className="glass-panel" 
+                style={{ border: isOnline ? '1px solid #4ade80' : '1px solid rgba(255,255,255,0.1)', color: isOnline ? '#4ade80' : 'white', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              <Power size={18} color={isOnline ? '#4ade80' : '#f87171'} />
+              {isOnline ? 'Go Offline' : 'Go Online'}
+            </button>
+            <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px' }}>
+              <Bell size={20} />
+            </div>
+          </div>
+        </header>
+
+        {/* New Ride Request Modal */}
+        {newRide && (
+            <div className="glass-panel" style={{ position: 'fixed', bottom: 20, right: 20, width: '350px', padding: '20px', zIndex: 1000, borderLeft: '5px solid var(--primary)', animation: 'slideIn 0.3s ease' }}>
+                <h4 style={{ marginBottom: '10px' }}>New Ride Request!</h4>
+                <p style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>₹{newRide.fare}</p>
+                <div style={{ margin: '10px 0' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>PICKUP</p>
+                    <p style={{ fontSize: '0.9rem' }}>{newRide.pickup}</p>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                    <button onClick={handleAcceptRide} className="btn-primary" style={{ flex: 1 }}>Accept</button>
+                    <button onClick={() => setNewRide(null)} className="glass-panel" style={{ flex: 1, color: '#f87171' }}>Reject</button>
+                </div>
+            </div>
+        )}
+
+        {/* Active Ride View */}
+        {activeRide ? (
+            <div className="glass-panel" style={{ padding: '30px', marginBottom: '30px', border: '1px solid var(--primary)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><Navigation2 size={24} /> Active Ride</h3>
+                    <div style={{ padding: '5px 15px', background: 'rgba(74, 222, 128, 0.2)', color: '#4ade80', borderRadius: '12px', fontSize: '0.8rem' }}>ONGOING</div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                    <div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>FROM</p>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '15px' }}>{activeRide.pickup}</p>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>TO</p>
+                        <p style={{ fontSize: '1.1rem' }}>{activeRide.destination}</p>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <div className="glass-panel" style={{ textAlign: 'center', padding: '15px' }}>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>OTP TO START</p>
+                            <h2 style={{ fontSize: '2rem', letterSpacing: '2px' }}>{activeRide.otp}</h2>
+                        </div>
+                        <button onClick={handleCompleteRide} className="btn-primary">Complete Ride</button>
+                    </div>
+                </div>
+            </div>
+        ) : (
+          /* Stats Grid */
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '30px' }}>
+            <div className="glass-panel" style={{ padding: '20px' }}>
+              <div style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>Total Earnings</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>₹{earnings}</div>
+            </div>
+            <div className="glass-panel" style={{ padding: '20px' }}>
+              <div style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>Status</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: isOnline ? '#4ade80' : '#f87171' }}>{isOnline ? 'Online' : 'Offline'}</div>
+            </div>
+            <div className="glass-panel" style={{ padding: '20px' }}>
+              <div style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>Rating</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>⭐ 4.98</div>
+            </div>
+          </div>
+        )}
+
+        <div className="glass-panel" style={{ height: '300px', padding: '20px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data}>
+                    <defs>
+                        <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
+                    <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
+                    <Tooltip 
+                        contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                        itemStyle={{ color: 'var(--primary)' }}
+                    />
+                    <Area type="monotone" dataKey="earnings" stroke="var(--primary)" fillOpacity={1} fill="url(#colorEarnings)" />
+                </AreaChart>
+            </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default CaptainDashboard;
+export default DriverDashboard;
