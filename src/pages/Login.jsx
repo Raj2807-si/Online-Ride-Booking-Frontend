@@ -18,10 +18,11 @@ const Login = () => {
     setError('');
 
     try {
-      let endpoint = role === 'captain' ? 'http://localhost:5000/api/captains/login' : 'http://localhost:5000/api/users/login';
-      const response = await axios.post(endpoint, { email, password });
+      let endpoint = role === 'captain' ? 'http://localhost:5000/api/drivers/login' : 'http://localhost:5000/api/users/login';
+      const payload = { email, password };
+      const response = await axios.post(endpoint, payload);
       
-      login(response.data.token, role);
+      login(response.data.token, role, response.data[role]);
 
       if (role === 'captain') {
         navigate('/captain-dashboard');

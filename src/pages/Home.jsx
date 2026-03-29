@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import usePlacesAutocomplete, {
+  getGeocode,
+  getLatLng,
+} from "use-places-autocomplete";
 import Map from '../components/Map';
 import { LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -7,8 +10,24 @@ import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
-  const [pickup, setPickup] = useState('');
-  const [destination, setDestination] = useState('');
+  const {
+    ready,
+    value: pickup,
+    suggestions: { status: pStatus, data: pData },
+    setValue: setPickup,
+    clearSuggestions: clearPSuggestions,
+  } = usePlacesAutocomplete();
+
+  const {
+    ready: dReady,
+    value: destination,
+    suggestions: { status: dStatus, data: dData },
+    setValue: setDestination,
+    clearSuggestions: clearDSuggestions,
+  } = usePlacesAutocomplete();
+
+  const [vehicleType, setVehicleType] = useState('car');
+  const [fare, setFare] = useState(null);
   const [isBooking, setIsBooking] = useState(false);
   const [socket, setSocket] = useState(null);
   const navigate = useNavigate();
@@ -25,10 +44,6 @@ const Home = () => {
     });
     setSocket(newSocket);
 
-    newSocket.on('new_ride_request', (ride) => {
-       // just listening
-    });
-
     return () => newSocket.disconnect();
   }, [navigate]);
 
@@ -40,15 +55,13 @@ const Home = () => {
       await axios.post('http://localhost:5000/api/rides/create', {
         pickup,
         destination,
-        fare: 150,
-        distance: 5,
-        duration: 900
+        vehicleType
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      // Simulate frontend callback handling since it takes time for a captain to accept
+      
       setTimeout(() => {
-        alert(`Request Sent! Waiting for Captain...`);
+        alert(`${vehicleType.toUpperCase()} request sent! Finding nearest driver...`);
         setIsBooking(false);
         setPickup('');
         setDestination('');
@@ -69,10 +82,10 @@ const Home = () => {
         </button>
       </div>
 
-      <Map />
+      <Map pickup={pickup} destination={destination} />
       
       <div className="booking-panel glass-panel">
-        <h3 style={{ marginBottom: '16px', fontSize: '1.25rem', fontWeight: '600' }}>Where are you going?</h3>
+        <h3 style={{ marginBottom: '16px', fontSize: '1.25rem', fontWeight: '600' }}>Book a Ride</h3>
         <form onSubmit={handleBookRide}>
           <div className="input-group">
             <input 
@@ -81,8 +94,18 @@ const Home = () => {
               placeholder="Pickup Location" 
               value={pickup}
               onChange={(e) => setPickup(e.target.value)}
+              disabled={!ready}
               required 
             />
+            {pStatus === "OK" && (
+                <ul className="glass-panel" style={{ position: 'absolute', width: '100%', zIndex: 10, listStyle: 'none', padding: '10px' }}>
+                    {pData.map(({ place_id, description }) => (
+                        <li key={place_id} onClick={() => { setPickup(description, false); clearPSuggestions(); }} style={{ padding: '8px', cursor: 'pointer' }}>
+                            {description}
+                        </li>
+                    ))}
+                </ul>
+            )}
           </div>
           <div className="input-group">
             <input 
@@ -91,11 +114,46 @@ const Home = () => {
               placeholder="Enter Destination" 
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
+              disabled={!dReady}
               required 
             />
+            {dStatus === "OK" && (
+                <ul className="glass-panel" style={{ position: 'absolute', width: '100%', zIndex: 10, listStyle: 'none', padding: '10px' }}>
+                    {dData.map(({ place_id, description }) => (
+                        <li key={place_id} onClick={() => { setDestination(description, false); clearDSuggestions(); }} style={{ padding: '8px', cursor: 'pointer' }}>
+                            {description}
+                        </li>
+                    ))}
+                </ul>
+            )}
           </div>
+
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+              <div 
+                onClick={() => setVehicleType('motorcycle')}
+                className={`glass-panel vehicle-opt ${vehicleType === 'motorcycle' ? 'active' : ''}`}
+                style={{ flex: 1, padding: '10px', textAlign: 'center', cursor: 'pointer', border: vehicleType === 'motorcycle' ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)' }}
+              >
+                🏍️ Bike
+              </div>
+              <div 
+                onClick={() => setVehicleType('auto')}
+                className={`glass-panel vehicle-opt ${vehicleType === 'auto' ? 'active' : ''}`}
+                style={{ flex: 1, padding: '10px', textAlign: 'center', cursor: 'pointer', border: vehicleType === 'auto' ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)' }}
+              >
+                🛺 Auto
+              </div>
+              <div 
+                onClick={() => setVehicleType('car')}
+                className={`glass-panel vehicle-opt ${vehicleType === 'car' ? 'active' : ''}`}
+                style={{ flex: 1, padding: '10px', textAlign: 'center', cursor: 'pointer', border: vehicleType === 'car' ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)' }}
+              >
+                🚗 Car
+              </div>
+          </div>
+
           <button type="submit" className="btn-primary" disabled={isBooking}>
-            {isBooking ? 'Finding Captain...' : 'Request Tripzo'}
+            {isBooking ? 'Finding Nearest Driver...' : 'Request Tripzo'}
           </button>
         </form>
       </div>

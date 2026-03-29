@@ -6,7 +6,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
 
-const CaptainDashboard = () => {
+const DriverDashboard = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [activeRequest, setActiveRequest] = useState(null);
   const [socket, setSocket] = useState(null);
@@ -14,7 +14,7 @@ const CaptainDashboard = () => {
   const { token, role } = useAuth();
 
   useEffect(() => {
-    if (!token || role !== 'captain') {
+    if (!token || role !== 'driver') {
       navigate('/login');
       return;
     }

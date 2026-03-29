@@ -27,7 +27,7 @@ const Signup = () => {
     setError('');
 
     try {
-      let endpoint = role === 'captain' ? 'http://localhost:5000/api/captains/register' : 'http://localhost:5000/api/users/register';
+      let endpoint = role === 'captain' ? 'http://localhost:5000/api/drivers/register' : 'http://localhost:5000/api/users/register';
       
       let payload = {
         fullname: { firstname, lastname },
@@ -45,7 +45,8 @@ const Signup = () => {
       }
 
       const response = await axios.post(endpoint, payload);
-      login(response.data.token, role);
+      const roleKey = role === 'captain' ? 'driver' : 'user';
+      login(response.data.token, role, response.data[roleKey]);
       
       if (role === 'captain') {
         navigate('/captain-dashboard');
