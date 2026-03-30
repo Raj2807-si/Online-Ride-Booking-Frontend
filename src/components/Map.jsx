@@ -34,26 +34,35 @@ const destinationIcon = new L.Icon({
     shadowSize: [41, 41]
 });
 
+const driverIcon = new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854894.png', // Simple car/driver icon
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+});
+
 // Component to handle map center and zoom when bounds change
-const MapUpdater = ({ pickup, destination }) => {
+const MapUpdater = ({ pickup, destination, driver }) => {
     const map = useMap();
     
     useEffect(() => {
         if (pickup && destination) {
-            const bounds = L.latLngBounds([
+            const points = [
                 [pickup.lat, pickup.lng],
                 [destination.lat, destination.lng]
-            ]);
+            ];
+            if (driver) points.push([driver.lat, driver.lng]);
+
+            const bounds = L.latLngBounds(points);
             map.fitBounds(bounds, { padding: [50, 50] });
         } else if (pickup) {
             map.setView([pickup.lat, pickup.lng], 14);
         }
-    }, [pickup, destination, map]);
+    }, [pickup, destination, driver, map]);
     
     return null;
 };
 
-const Map = ({ pickup, destination }) => {
+const Map = ({ pickup, destination, driver }) => {
     const [route, setRoute] = useState(null);
     const defaultCenter = [28.6139, 77.2090]; // Delhi
 
@@ -88,10 +97,11 @@ const Map = ({ pickup, destination }) => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             />
             
-            <MapUpdater pickup={pickup} destination={destination} />
+            <MapUpdater pickup={pickup} destination={destination} driver={driver} />
 
             {pickup && <Marker position={[pickup.lat, pickup.lng]} icon={pickupIcon} />}
             {destination && <Marker position={[destination.lat, destination.lng]} icon={destinationIcon} />}
+            {driver && <Marker position={[driver.lat, driver.lng]} icon={driverIcon} />}
             
             {route && <Polyline positions={route} color="#4f46e5" weight={5} opacity={0.8} />}
         </MapContainer>

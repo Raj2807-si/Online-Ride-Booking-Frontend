@@ -27,7 +27,7 @@ const Signup = () => {
     setError('');
 
     try {
-      let endpoint = role === 'captain' ? 'http://localhost:5000/api/drivers/register' : 'http://localhost:5000/api/users/register';
+      let endpoint = role === 'driver' ? 'http://localhost:5000/api/drivers/register' : 'http://localhost:5000/api/users/register';
       
       let payload = {
         fullname: { firstname, lastname },
@@ -35,7 +35,7 @@ const Signup = () => {
         password
       };
 
-      if (role === 'captain') {
+      if (role === 'driver') {
         payload.vehicle = {
           color: vehicleColor,
           plate: vehiclePlate,
@@ -45,11 +45,14 @@ const Signup = () => {
       }
 
       const response = await axios.post(endpoint, payload);
-      const roleKey = role === 'captain' ? 'driver' : 'user';
-      login(response.data.token, role, response.data[roleKey]);
+      const userData = role === 'driver' ? response.data.driver : response.data.user;
+      const finalRole = userData.role || role;
+      login(response.data.token, finalRole, userData);
       
-      if (role === 'captain') {
+      if (finalRole === 'driver') {
         navigate('/captain-dashboard');
+      } else if (finalRole === 'admin') {
+        navigate('/admin-dashboard');
       } else {
         navigate('/');
       }
@@ -64,7 +67,7 @@ const Signup = () => {
     <div className="auth-container">
       <div className="auth-card glass-panel" style={{ maxWidth: '480px' }}>
         <h2 className="auth-title">Create Account</h2>
-        <p className="auth-subtitle">Ride with us as a {role === 'captain' ? 'Captain' : 'Rider'}</p>
+        <p className="auth-subtitle">Ride with us as a {role === 'driver' ? 'Captain' : 'Rider'}</p>
         
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
           <button 
@@ -78,8 +81,8 @@ const Signup = () => {
           <button 
             type="button" 
             className="btn-primary" 
-            style={{ opacity: role === 'captain' ? 1 : 0.5, backgroundColor: role === 'captain' ? 'var(--primary)' : 'var(--bg-card)', color: role === 'captain' ? '#000': '#fff' }}
-            onClick={() => setRole('captain')}
+            style={{ opacity: role === 'driver' ? 1 : 0.5, backgroundColor: role === 'driver' ? 'var(--primary)' : 'var(--bg-card)', color: role === 'driver' ? '#000': '#fff' }}
+            onClick={() => setRole('driver')}
           >
             Captain
           </button>
@@ -133,7 +136,7 @@ const Signup = () => {
             />
           </div>
 
-          {role === 'captain' && (
+          {role === 'driver' && (
             <div style={{ padding: '20px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '8px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
               <h4 style={{ marginBottom: '16px', color: 'var(--primary)' }}>Vehicle Details</h4>
               <div className="form-row">

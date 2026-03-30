@@ -26,7 +26,7 @@ function App() {
             <Route path="/book-ride" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/driver-dashboard" element={<DriverDashboard />} />
+            <Route path="/captain-dashboard" element={<DriverDashboard />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/wallet" element={<Wallet />} />
             <Route path="/self-driving" element={<SelfDriving />} />

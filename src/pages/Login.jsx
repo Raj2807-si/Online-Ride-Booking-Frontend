@@ -18,13 +18,17 @@ const Login = () => {
     setError('');
 
     try {
-      let endpoint = role === 'captain' ? 'http://localhost:5000/api/drivers/login' : 'http://localhost:5000/api/users/login';
+      let endpoint = role === 'driver' ? 'http://localhost:5000/api/drivers/login' : 'http://localhost:5000/api/users/login';
       const payload = { email, password };
       const response = await axios.post(endpoint, payload);
       
-      login(response.data.token, role, response.data[role]);
+      const userData = role === 'driver' ? response.data.driver : response.data.user;
+      const finalRole = userData.role || role; // Use server role if available
+      login(response.data.token, finalRole, userData);
 
-      if (role === 'captain') {
+      if (finalRole === 'admin') {
+        navigate('/admin-dashboard');
+      } else if (finalRole === 'driver') {
         navigate('/captain-dashboard');
       } else {
         navigate('/');
@@ -40,7 +44,7 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card glass-panel">
         <h2 className="auth-title">Welcome Back</h2>
-        <p className="auth-subtitle">Login to your {role === 'captain' ? 'Captain' : 'Rider'} account</p>
+        <p className="auth-subtitle">Login to your {role === 'driver' ? 'Captain' : 'Rider'} account</p>
         
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
           <button 
@@ -54,8 +58,8 @@ const Login = () => {
           <button 
             type="button" 
             className="btn-primary" 
-            style={{ opacity: role === 'captain' ? 1 : 0.5, backgroundColor: role === 'captain' ? 'var(--primary)' : 'var(--bg-card)', color: role === 'captain' ? '#000': '#fff' }}
-            onClick={() => setRole('captain')}
+            style={{ opacity: role === 'driver' ? 1 : 0.5, backgroundColor: role === 'driver' ? 'var(--primary)' : 'var(--bg-card)', color: role === 'driver' ? '#000': '#fff' }}
+            onClick={() => setRole('driver')}
           >
             Captain
           </button>

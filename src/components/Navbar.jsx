@@ -6,12 +6,19 @@ import { useAuth } from '../context/AuthContext';
 const Navbar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const { token, logout } = useAuth();
+  const { token, role, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     setIsOpen(false);
     navigate('/');
+  };
+
+  const getDashboardPath = () => {
+    if (role === 'admin') return '/admin-dashboard';
+    if (role === 'driver') return '/captain-dashboard';
+    return '/book-ride';
   };
 
   const isActive = (path) => location.pathname === path ? { color: 'var(--primary)', fontWeight: 'bold' } : { color: 'white' };
@@ -32,9 +39,16 @@ const Navbar = () => {
 
       <div className="nav-desktop" style={{ display: 'flex', gap: '15px' }}>
         {token ? (
-          <button onClick={handleLogout} style={{ background: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
-            Logout
-          </button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Link to={getDashboardPath()} style={{ textDecoration: 'none' }}>
+              <button className="btn-primary" style={{ padding: '10px 20px', width: 'auto', fontSize: '0.9rem' }}>
+                Dashboard
+              </button>
+            </Link>
+            <button onClick={handleLogout} style={{ background: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+              Logout
+            </button>
+          </div>
         ) : (
           <>
             <Link to="/login" style={{ textDecoration: 'none' }}>
@@ -63,11 +77,17 @@ const Navbar = () => {
            <Link to="/about" style={{ textDecoration: 'none', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', ...isActive('/about') }} onClick={() => setIsOpen(false)}>About</Link>
            <Link to="/services" style={{ textDecoration: 'none', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', ...isActive('/services') }} onClick={() => setIsOpen(false)}>Services</Link>
            <Link to="/contact" style={{ textDecoration: 'none', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', ...isActive('/contact') }} onClick={() => setIsOpen(false)}>Contact</Link>
+
            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
               {token ? (
-                <button onClick={() => { handleLogout(); setIsOpen(false); }} style={{ width: '100%', background: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '12px 20px', borderRadius: '8px' }}>
-                  Logout
-                </button>
+                <>
+                  <Link to={getDashboardPath()} style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
+                    <button className="btn-primary" style={{ width: '100%', padding: '12px 20px' }}>Dashboard</button>
+                  </Link>
+                  <button onClick={() => { handleLogout(); setIsOpen(false); }} style={{ width: '100%', background: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '12px 20px', borderRadius: '8px' }}>
+                    Logout
+                  </button>
+                </>
               ) : (
                 <>
                   <Link to="/login" style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>

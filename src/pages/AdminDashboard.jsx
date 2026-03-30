@@ -5,7 +5,7 @@ import axios from 'axios';
 import { LayoutDashboard, UserCheck, Car, Settings } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const { token, logout } = useAuth();
+  const { token, role, logout } = useAuth();
   const [pendingDrivers, setPendingDrivers] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,9 +14,13 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (role !== 'admin') {
+        navigate('/login');
+        return;
+    }
     fetchPendingDrivers();
     fetchFleet();
-  }, []);
+  }, [role, navigate]);
 
   const fetchPendingDrivers = async () => {
     try {
@@ -108,7 +112,7 @@ const AdminDashboard = () => {
                     {pendingDrivers.length === 0 ? <p style={{ color: 'var(--text-muted)' }}>No drivers currently awaiting verification.</p> : pendingDrivers.map(d => (
                         <div key={d._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                             <div>
-                                <p style={{ fontWeight: '600' }}>{d.fullname}</p>
+                                <p style={{ fontWeight: '600' }}>{d.fullname?.firstname} {d.fullname?.lastname}</p>
                                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{d.email} | Vehicle: {d.vehicle?.plate || 'N/A'}</p>
                             </div>
                             <div style={{ display: 'flex', gap: '10px' }}>
