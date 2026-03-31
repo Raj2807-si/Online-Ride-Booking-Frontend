@@ -72,8 +72,8 @@ const AdminDashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="sidebar glass-panel">
-        <div className="logo" style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '40px' }}>Tripzo Admin</div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="logo" style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold' }}>Tripzo Admin</div>
+        <nav>
           <div className="nav-item active"><LayoutDashboard size={20} /> Overview</div>
           <div className="nav-item"><UserCheck size={20} /> Verifications</div>
           <div className="nav-item"><Car size={20} /> Fleet</div>
@@ -82,12 +82,12 @@ const AdminDashboard = () => {
       </div>
 
       <div className="main-content">
-        <header style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <header className="u-stack-mobile" style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
           <h2 style={{ fontSize: '1.75rem' }}>Management Console</h2>
           <button onClick={() => { logout(); navigate('/'); }} className="btn-primary" style={{ width: 'auto' }}>Logout</button>
         </header>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
+        <div className="u-grid u-grid-4" style={{ marginBottom: '40px' }}>
           <div className="glass-panel" style={{ padding: '20px' }}>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Pending Drivers</div>
             <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{pendingDrivers.length}</div>
@@ -134,32 +134,34 @@ const AdminDashboard = () => {
                 <button onClick={() => setShowAddVehicle(true)} className="btn-primary" style={{ width: 'auto', padding: '8px 20px' }}>+ Add Vehicle</button>
             </div>
             
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                <thead>
-                    <tr style={{ borderBottom: '2px solid rgba(255,255,255,0.1)' }}>
-                        <th style={{ padding: '15px' }}>Vehicle Name</th>
-                        <th style={{ padding: '15px' }}>Type</th>
-                        <th style={{ padding: '15px' }}>Plate</th>
-                        <th style={{ padding: '15px' }}>Daily Rate</th>
-                        <th style={{ padding: '15px' }}>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {fleet.length === 0 ? <tr><td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>No vehicles in fleet.</td></tr> : fleet.map(v => (
-                        <tr key={v._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                            <td style={{ padding: '15px' }}>{v.name}</td>
-                            <td style={{ padding: '15px' }}>{v.category.toUpperCase()}</td>
-                            <td style={{ padding: '15px' }}>{v.plate}</td>
-                            <td style={{ padding: '15px' }}>₹{v.dailyRate}</td>
-                            <td style={{ padding: '15px' }}>
-                                <span style={{ padding: '4px 12px', background: v.status === 'available' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(239, 68, 68, 0.2)', color: v.status === 'available' ? '#4ade80' : '#f87171', borderRadius: '12px', fontSize: '0.75rem' }}>
-                                    {v.status.toUpperCase()}
-                                </span>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <div className="u-table-responsive">
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
+                  <thead>
+                      <tr style={{ borderBottom: '2px solid rgba(255,255,255,0.1)' }}>
+                          <th style={{ padding: '15px' }}>Vehicle Name</th>
+                          <th style={{ padding: '15px' }}>Type</th>
+                          <th style={{ padding: '15px' }}>Plate</th>
+                          <th style={{ padding: '15px' }}>Daily Rate</th>
+                          <th style={{ padding: '15px' }}>Status</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {fleet.length === 0 ? <tr><td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>No vehicles in fleet.</td></tr> : fleet.map(v => (
+                          <tr key={v._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                              <td style={{ padding: '15px' }}>{v.name}</td>
+                              <td style={{ padding: '15px' }}>{v.category.toUpperCase()}</td>
+                              <td style={{ padding: '15px' }}>{v.plate}</td>
+                              <td style={{ padding: '15px' }}>₹{v.dailyRate}</td>
+                              <td style={{ padding: '15px' }}>
+                                  <span style={{ padding: '4px 12px', background: v.status === 'available' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(239, 68, 68, 0.2)', color: v.status === 'available' ? '#4ade80' : '#f87171', borderRadius: '12px', fontSize: '0.75rem' }}>
+                                      {v.status.toUpperCase()}
+                                  </span>
+                              </td>
+                          </tr>
+                      ))}
+                  </tbody>
+              </table>
+            </div>
         </section>
 
         {showAddVehicle && (

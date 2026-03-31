@@ -111,18 +111,18 @@ const DriverDashboard = () => {
     <div className="dashboard-container">
       {/* Sidebar */}
       <div className="sidebar glass-panel">
-        <div className="logo" style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '40px' }}>Tripzo</div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="logo" style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold' }}>Tripzo</div>
+        <nav>
           <div className="nav-item active"><LayoutDashboard size={20} /> Dashboard</div>
           <div className="nav-item"><MapPin size={20} /> Today's Rides</div>
           <div className="nav-item"><Settings size={20} /> Settings</div>
         </nav>
 
-        <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-           <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold' }}>
+        <div className="nav-user" style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+           <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold', flexShrink: 0 }}>
              {user?.fullname?.firstname?.[0] || 'D'}
            </div>
-           <div>
+           <div className="u-hide-mobile">
              <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{user?.fullname?.firstname} {user?.fullname?.lastname}</div>
              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{isOnline ? 'Online' : 'Offline'}</div>
            </div>
@@ -131,9 +131,9 @@ const DriverDashboard = () => {
 
       {/* Main Content */}
       <div className="main-content">
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <header className="u-stack-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px', gap: '20px' }}>
           <h2 style={{ fontSize: '1.75rem' }}>Welcome back, {user?.fullname?.firstname}!</h2>
-          <div style={{ display: 'flex', gap: '15px' }}>
+          <div style={{ display: 'flex', gap: '15px', width: 'auto' }}>
             <button 
                 onClick={handleToggleStatus}
                 className="glass-panel" 
@@ -217,7 +217,8 @@ const DriverDashboard = () => {
             </div>
         ) : (
           /* Stats Grid */
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '30px' }}>
+          /* Stats Grid */
+          <div className="u-grid u-grid-3" style={{ marginBottom: '30px' }}>
             <div className="glass-panel" style={{ padding: '20px' }}>
               <div style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>Total Earnings</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>₹{earnings}</div>

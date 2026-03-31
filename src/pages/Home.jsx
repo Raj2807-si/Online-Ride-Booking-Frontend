@@ -106,14 +106,14 @@ const Home = () => {
   return (
     <div className="map-container">
       {/* Absolute Header */}
-      <div style={{ position: 'absolute', top: 20, left: 20, right: 20, zIndex: 1000, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="u-stack-mobile u-no-gap-mobile" style={{ position: 'absolute', top: 20, left: 20, right: 20, zIndex: 1000, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
         <h1 style={{ color: 'var(--primary)', textShadow: '0 2px 4px rgba(0,0,0,0.5)', fontSize: '1.5rem', fontWeight: 'bold' }}>Tripzo</h1>
-        <div style={{ display: 'flex', gap: '15px' }}>
-            <button onClick={() => navigate('/wallet')} className="glass-panel" style={{ border: 'none', padding: '10px 20px', color: 'white', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={() => navigate('/wallet')} className="glass-panel" style={{ border: 'none', padding: '10px 15px', color: 'white', cursor: 'pointer', fontSize: '0.9rem' }}>
                 ₹{user?.walletBalance || 0}
             </button>
-            <button onClick={() => { logout(); navigate('/login'); }} className="glass-panel" style={{ border: 'none', padding: '10px 20px', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <LogOut size={18} /> Logout
+            <button onClick={() => { logout(); navigate('/login'); }} className="glass-panel" style={{ border: 'none', padding: '10px 15px', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
+                <LogOut size={16} /> <span className="u-hide-mobile">Logout</span>
             </button>
         </div>
       </div>

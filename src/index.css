@@ -159,36 +159,138 @@ body {
   z-index: 1000;
 }
 
-/* Dashboard */
+/* Dashboard Layout */
 .dashboard-container {
-  padding: 20px;
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-dark);
 }
 
-/* Mobile Responsiveness */
+.sidebar {
+  width: 280px;
+  min-height: 100vh;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-radius: 0;
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover, .nav-item.active {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--primary);
+}
+
+@media (max-width: 1024px) {
+  .sidebar { width: 220px; }
+  .main-content { padding: 30px; }
+}
+
 @media (max-width: 768px) {
-  h1 { font-size: 2.5rem !important; }
-  h2 { font-size: 2rem !important; }
-  .auth-card { padding: 24px; }
-  .booking-panel { width: 95%; padding: 16px; }
+  .dashboard-container { flex-direction: column; }
   
-  /* Auto-stack grids and flex containers on mobile */
-  div[style*="gridTemplateColumns"] {
-    grid-template-columns: 1fr !important;
-  }
-  div[style*="display: flex"][style*="alignItems: center"][style*="gap: 40px"],
-  div[style*="display: flex"][style*="alignItems: center"][style*="gap: 60px"] {
-    flex-direction: column !important;
-    text-align: center;
+  .sidebar {
+    width: 100% !important;
+    min-height: auto;
+    padding: 15px 20px;
+    border-radius: 0 0 16px 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 1001;
   }
   
-  .form-row {
-    flex-direction: column;
-    gap: 0px;
+  .sidebar .logo { margin-bottom: 0 !important; }
+  .sidebar nav { display: none !important; } /* Hide main nav on mobile sidebar */
+  .sidebar .nav-user { margin-top: 0 !important; }
+  
+  .main-content { padding: 20px; }
+}
+
+/* Mobile Responsiveness & Utility Classes */
+@media (max-width: 1024px) {
+  h1 { font-size: 2.25rem !important; }
+  h2 { font-size: 1.75rem !important; }
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 2rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  .u-title-mobile { font-size: 3rem !important; }
+  .auth-card { padding: 20px; }
+  .booking-panel { 
+    width: 100%; 
+    bottom: 0px; 
+    border-radius: 20px 20px 0 0; 
+    padding: 20px; 
   }
+  
+  .u-hide-mobile { display: none !important; }
+  .u-show-mobile { display: block !important; }
+  .u-stack-mobile { flex-direction: column !important; }
+  .u-no-gap-mobile { gap: 0 !important; }
+  
+  /* Tables */
+  .u-table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .dashboard-container { padding: 10px; }
+  .sidebar { width: 100% !important; margin-bottom: 20px; }
   
   /* Navbar specific media queries */
   .nav-desktop { display: none !important; }
   .nav-mobile-btn { display: block !important; }
+}
+
+/* Specific Utility Classes for cleaner layouts */
+.u-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.u-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.u-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.u-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 900px) {
+  .u-grid-3, .u-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .u-grid-2, .u-grid-3, .u-grid-4 { grid-template-columns: 1fr; }
+}
+
+/* For dashboards that use sidebars */
+.flex-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .flex-layout { flex-direction: column; }
 }
 
 .nav-mobile-btn { display: none; background: transparent; border: none; color: white; cursor: pointer; }

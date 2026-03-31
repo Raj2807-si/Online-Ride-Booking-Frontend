@@ -16,17 +16,17 @@ const LandingPage = () => {
         <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(250,204,21,0.15) 0%, rgba(18,18,18,0) 70%)', borderRadius: '50%', zIndex: -1 }}></div>
         <div style={{ position: 'absolute', bottom: '-10%', left: '-20%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(250,204,21,0.1) 0%, rgba(18,18,18,0) 70%)', borderRadius: '50%', zIndex: -1 }}></div>
 
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '120px 20px', display: 'flex', alignItems: 'center', gap: '40px', width: '100%' }}>
+        <div className="u-stack-mobile" style={{ maxWidth: '1200px', margin: '0 auto', padding: '120px 20px', display: 'flex', alignItems: 'center', gap: '40px', width: '100%' }}>
           
           <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: '4.5rem', fontWeight: '800', lineHeight: 1.1, marginBottom: '24px' }}>
+            <h1 className="u-title-mobile" style={{ fontSize: '4.5rem', fontWeight: '800', lineHeight: 1.1, marginBottom: '24px' }}>
               Your Ride,<br/>
               <span style={{ color: 'var(--primary)' }}>Reimagined.</span>
             </h1>
             <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '40px', maxWidth: '500px', lineHeight: 1.6 }}>
               Experience the fastest, safest, and most affordable way to navigate your city. Tap a button, get a ride.
             </p>
-            <div style={{ display: 'flex', gap: '20px' }}>
+            <div className="u-stack-mobile" style={{ display: 'flex', gap: '20px' }}>
               <Link to="/book-ride" style={{ textDecoration: 'none' }}>
                 <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px 32px', fontSize: '1.1rem', width: 'auto' }}>
                   Book a Ride <ArrowRight size={20} />
@@ -68,7 +68,7 @@ const LandingPage = () => {
              <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem' }}>We combine technology with care to provide the best mobility experience.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
+          <div className="u-grid u-grid-3">
              <div className="glass-panel" style={{ padding: '40px', textAlign: 'center' }}>
               <ShieldCheck size={48} color="var(--primary)" style={{ margin: '0 auto 20px' }} />
               <h3 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Verified Captains</h3>

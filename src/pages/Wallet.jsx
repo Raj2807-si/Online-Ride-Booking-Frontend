@@ -32,13 +32,13 @@ const Wallet = () => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', minHeight: '100vh' }}>
       <h2 style={{ marginBottom: '20px' }}>Your Wallet</h2>
       
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+      <div className="u-grid u-grid-2" style={{ marginBottom: '30px' }}>
         <div className="glass-panel" style={{ padding: '30px', textAlign: 'center' }}>
           <p style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>Current Balance</p>
-          <h1 style={{ fontSize: '3rem', color: 'var(--primary)' }}>₹{balance}</h1>
+          <h1 style={{ fontSize: '3rem', color: 'var(--primary)', marginBottom: '0' }}>₹{balance}</h1>
         </div>
         
         <UPIPayment amount="500" />
