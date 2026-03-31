@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, MapPin, Settings, Bell, Power, Navigation2 } from 'lucide-react';
 import { 
@@ -41,7 +42,7 @@ const DriverDashboard = () => {
 
     const fetchEarnings = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/drivers/earnings', {
+        const response = await axios.get(`${API_BASE_URL}/api/drivers/earnings`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setEarnings(response.data.earnings);
@@ -49,7 +50,7 @@ const DriverDashboard = () => {
     };
     fetchEarnings();
 
-    const newSocket = io('http://localhost:5000', { auth: { token } });
+    const newSocket = io(`${API_BASE_URL}`, { auth: { token } });
     setSocket(newSocket);
 
     newSocket.on('new_ride_request', (ride) => {
@@ -62,7 +63,7 @@ const DriverDashboard = () => {
   const handleToggleStatus = async () => {
     try {
         const nextStatus = isOnline ? 'inactive' : 'active';
-        await axios.post('http://localhost:5000/api/drivers/toggle-status', { status: nextStatus }, {
+        await axios.post(`${API_BASE_URL}/api/drivers/toggle-status`, { status: nextStatus }, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setIsOnline(!isOnline);
@@ -71,7 +72,7 @@ const DriverDashboard = () => {
 
   const handleAcceptRide = async () => {
     try {
-        const response = await axios.post(`http://localhost:5000/api/rides/accept/${newRide._id}`, {}, {
+        const response = await axios.post(`${API_BASE_URL}/api/rides/accept/${newRide._id}`, {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setActiveRide(response.data);
@@ -81,7 +82,7 @@ const DriverDashboard = () => {
 
   const handleStartRide = async (otp) => {
     try {
-        const response = await axios.post(`http://localhost:5000/api/rides/start`, { 
+        const response = await axios.post(`${API_BASE_URL}/api/rides/start`, { 
             rideId: activeRide._id, 
             otp 
         }, {
@@ -93,13 +94,13 @@ const DriverDashboard = () => {
 
   const handleCompleteRide = async () => {
     try {
-        await axios.post(`http://localhost:5000/api/rides/complete/${activeRide._id}`, {}, {
+        await axios.post(`${API_BASE_URL}/api/rides/complete/${activeRide._id}`, {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setActiveRide(null);
         alert('Ride completed & earnings credited!');
         // Refresh earnings
-        const res = await axios.get('http://localhost:5000/api/drivers/earnings', {
+        const res = await axios.get(`${API_BASE_URL}/api/drivers/earnings`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setEarnings(res.data.earnings);

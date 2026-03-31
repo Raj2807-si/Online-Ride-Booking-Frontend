@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
@@ -27,7 +28,7 @@ const Signup = () => {
     setError('');
 
     try {
-      let endpoint = role === 'driver' ? 'http://localhost:5000/api/drivers/register' : 'http://localhost:5000/api/users/register';
+      let endpoint = role === 'driver' ? `${API_BASE_URL}/api/drivers/register` : `${API_BASE_URL}/api/users/register`;
       
       let payload = {
         fullname: { firstname, lastname },

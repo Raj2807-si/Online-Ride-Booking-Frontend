@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 import { LayoutDashboard, UserCheck, Car, Settings } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -24,7 +25,7 @@ const AdminDashboard = () => {
 
   const fetchPendingDrivers = async () => {
     try {
-        const response = await axios.get('http://localhost:5000/api/drivers/pending', {
+        const response = await axios.get(`${API_BASE_URL}/api/drivers/pending`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setPendingDrivers(response.data);
@@ -34,7 +35,7 @@ const AdminDashboard = () => {
 
   const fetchFleet = async () => {
     try {
-        const response = await axios.get('http://localhost:5000/api/vehicles/all');
+        const response = await axios.get(`${API_BASE_URL}/api/vehicles/all`);
         setFleet(response.data);
     } catch (err) { console.error('Error fetching fleet', err); }
   };
@@ -45,7 +46,7 @@ const AdminDashboard = () => {
     const vehicleData = Object.fromEntries(formData.entries());
     
     try {
-        await axios.post('http://localhost:5000/api/vehicles/add', {
+        await axios.post(`${API_BASE_URL}/api/vehicles/add`, {
             ...vehicleData,
             hourlyRate: Number(vehicleData.hourlyRate),
             dailyRate: Number(vehicleData.dailyRate)
@@ -60,7 +61,7 @@ const AdminDashboard = () => {
 
   const handleVerify = async (id) => {
     try {
-        await axios.post(`http://localhost:5000/api/drivers/verify/${id}`, {}, {
+        await axios.post(`${API_BASE_URL}/api/drivers/verify/${id}`, {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
         alert('Driver verified!');
@@ -200,7 +201,7 @@ const AdminDashboard = () => {
                     <button onClick={() => setSelectedDoc(null)} style={{ position: 'absolute', top: -40, right: 0, color: 'white', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem' }}>Close</button>
                     <h4 style={{ marginBottom: '20px' }}>Document Viewer</h4>
                     <iframe 
-                        src={`http://localhost:5000/api/drivers/document/${selectedDoc}`} 
+                        src={`${API_BASE_URL}/api/drivers/document/${selectedDoc}`} 
                         style={{ width: '100%', height: '500px', border: 'none', borderRadius: '12px', background: 'white' }}
                         title="Document"
                     />

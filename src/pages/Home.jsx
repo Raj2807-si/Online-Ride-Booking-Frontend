@@ -4,6 +4,7 @@ import { LogOut, Navigation, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 import debounce from 'lodash.debounce';
 
@@ -30,7 +31,7 @@ const Home = () => {
       return;
     }
 
-    const newSocket = io('http://localhost:5000', {
+    const newSocket = io(`${API_BASE_URL}`, {
        auth: { token }
     });
     setSocket(newSocket);
@@ -81,7 +82,7 @@ const Home = () => {
     setIsBooking(true);
     
     try {
-      await axios.post('http://localhost:5000/api/rides/create', {
+      await axios.post(`${API_BASE_URL}/api/rides/create`, {
         pickup,
         pickupCoords,
         destination,

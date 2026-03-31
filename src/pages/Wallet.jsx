@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 import UPIPayment from '../components/UPIPayment';
 
 const Wallet = () => {
@@ -15,10 +16,10 @@ const Wallet = () => {
 
   const fetchWalletData = async () => {
     try {
-      const balanceRes = await axios.get('http://localhost:5000/api/users/wallet/balance', {
+      const balanceRes = await axios.get(`${API_BASE_URL}/api/users/wallet/balance`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const transRes = await axios.get('http://localhost:5000/api/users/wallet/transactions', {
+      const transRes = await axios.get(`${API_BASE_URL}/api/users/wallet/transactions`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBalance(balanceRes.data.balance);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
@@ -18,7 +19,7 @@ const Login = () => {
     setError('');
 
     try {
-      let endpoint = role === 'driver' ? 'http://localhost:5000/api/drivers/login' : 'http://localhost:5000/api/users/login';
+      let endpoint = role === 'driver' ? `${API_BASE_URL}/api/drivers/login` : `${API_BASE_URL}/api/users/login`;
       const payload = { email, password };
       const response = await axios.post(endpoint, payload);
       

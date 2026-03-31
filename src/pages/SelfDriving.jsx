@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
 
 const SelfDriving = () => {
@@ -15,7 +16,7 @@ const SelfDriving = () => {
 
   const fetchVehicles = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/vehicles/all');
+      const response = await axios.get(`${API_BASE_URL}/api/vehicles/all`);
       setVehicles(response.data);
       setLoading(false);
     } catch (error) {
@@ -26,7 +27,7 @@ const SelfDriving = () => {
 
   const handleBook = async (vehicleId) => {
     try {
-      await axios.post('http://localhost:5000/api/vehicles/book', {
+      await axios.post(`${API_BASE_URL}/api/vehicles/book`, {
         vehicleId,
         duration: 1,
         durationType: 'daily'
