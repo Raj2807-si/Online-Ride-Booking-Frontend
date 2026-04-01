@@ -33,6 +33,7 @@ const DriverDashboard = () => {
   const [earnings, setEarnings] = useState(0);
   const [isOnline, setIsOnline] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [paymentConfirmed, setPaymentConfirmed] = useState(null);
 
   useEffect(() => {
     if (!token || role !== 'driver') {
@@ -55,6 +56,11 @@ const DriverDashboard = () => {
 
     newSocket.on('new_ride_request', (ride) => {
         if (!activeRide) setNewRide(ride);
+    });
+
+    newSocket.on(`payment_confirmed_${user?.id}`, (data) => {
+        setPaymentConfirmed(data);
+        setTimeout(() => setPaymentConfirmed(null), 5000);
     });
 
     return () => newSocket.disconnect();
@@ -155,6 +161,13 @@ const DriverDashboard = () => {
             </div>
           </div>
         </header>
+
+        {paymentConfirmed && (
+            <div className="glass-panel" style={{ background: 'rgba(74, 222, 128, 0.1)', border: '1px solid #4ade80', color: '#4ade80', padding: '15px', borderRadius: '12px', marginBottom: '30px', textAlign: 'center', animation: 'fadeIn 0.3s ease' }}>
+                <strong style={{ display: 'block', fontSize: '1.1rem' }}>🎉 Payment Confirmed!</strong>
+                <span style={{ fontSize: '0.9rem' }}>The rider paid via {paymentConfirmed.paymentMethod.toUpperCase()}</span>
+            </div>
+        )}
 
         {/* New Ride Request Modal */}
         {newRide && (

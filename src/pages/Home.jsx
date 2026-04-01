@@ -22,6 +22,10 @@ const Home = () => {
   const [socket, setSocket] = useState(null);
   const [activeRide, setActiveRide] = useState(null);
   const [driverLocation, setDriverLocation] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [paymentPhase, setPaymentPhase] = useState(false);
+  const [completedRide, setCompletedRide] = useState(null);
+  const [showUPI, setShowUPI] = useState(false);
   const navigate = useNavigate();
   const { user, token, logout } = useAuth();
 
@@ -49,7 +53,8 @@ const Home = () => {
     newSocket.on(`ride_completed_${user?.id}`, (ride) => {
         setActiveRide(null);
         setDriverLocation(null);
-        alert('Ride completed! Thank you for using Tripzo.');
+        setCompletedRide(ride);
+        setPaymentPhase(true);
     });
 
     newSocket.on('driver_location_update', (data) => {
@@ -75,8 +80,9 @@ const Home = () => {
 
   const handleBookRide = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     if (!pickupCoords || !destinationCoords) {
-        alert('Please select valid locations from the suggestions.');
+        setErrorMessage('Please select valid locations from the suggestions.');
         return;
     }
     setIsBooking(true);
@@ -98,8 +104,29 @@ const Home = () => {
       setDestination('');
       // Keep coords for the map until accepted
     } catch (err) {
-       alert(err.response?.data?.message || err.message || 'Error booking ride');
+       const msg = err.response?.data?.message || err.message || 'Error booking ride';
+       setErrorMessage(msg);
        setIsBooking(false);
+    }
+  };
+
+  const handleProcessPayment = async (method) => {
+    try {
+      await axios.post(`${API_BASE_URL}/api/rides/process-payment`, {
+        rideId: completedRide._id,
+        paymentMethod: method
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      alert(`Payment successful via ${method.toUpperCase()}!`);
+      setShowUPI(false);
+      setPaymentPhase(false);
+      setCompletedRide(null);
+      // Refresh to update balance view
+      window.location.reload(); 
+    } catch (err) {
+      alert(err.response?.data?.message || 'Payment failed. Please try again.');
     }
   };
 
@@ -124,7 +151,60 @@ const Home = () => {
         driver={driverLocation}
       />
 
-      {activeRide ? (
+      {paymentPhase && completedRide ? (
+        <div className="booking-panel glass-panel" style={{ border: '2px solid var(--primary)' }}>
+            <h3 style={{ color: 'var(--primary)', marginBottom: '20px', fontSize: '1.5rem' }}>Ride Completed!</h3>
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '12px', marginBottom: '20px', textAlign: 'center' }}>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '5px' }}>TOTAL FARE</p>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>₹{completedRide.fare}</h2>
+            </div>
+            
+            <p style={{ marginBottom: '15px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Select Payment Method:</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button 
+                  onClick={() => handleProcessPayment('wallet')} 
+                  className="btn-primary" 
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px' }}
+                >
+                    <span style={{ fontWeight: '600' }}>Wallet</span>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>Balance: ₹{user?.walletBalance || 0}</span>
+                </button>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <button 
+                        onClick={() => setShowUPI(true)} 
+                        className="glass-panel" 
+                        style={{ flex: 1, color: '#3b82f6', padding: '15px', border: '1px solid rgba(59, 130, 246, 0.2)', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                        UPI
+                    </button>
+                    <button 
+                        onClick={() => handleProcessPayment('cash')} 
+                        className="glass-panel" 
+                        style={{ flex: 1, color: 'white', padding: '15px', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                        Cash
+                    </button>
+                </div>
+
+                {showUPI && (
+                    <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6', borderRadius: '12px', padding: '20px', textAlign: 'center', marginTop: '10px', animation: 'fadeIn 0.3s ease' }}>
+                        <p style={{ color: '#3b82f6', fontSize: '0.8rem', marginBottom: '10px' }}>Scan this QR or Pay to: <strong>tripzo@upi</strong></p>
+                        <div style={{ width: '150px', height: '150px', background: 'white', margin: '0 auto 15px', padding: '10px', borderRadius: '8px' }}>
+                           {/* Placeholder for QR - or just a box */}
+                           <div style={{ width: '100%', height: '100%', border: '4px dashed #3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold', fontSize: '0.9rem' }}>QR CODE</div>
+                        </div>
+                        <button 
+                            onClick={() => handleProcessPayment('upi')} 
+                            className="btn-primary" 
+                            style={{ background: '#3b82f6', border: 'none', width: '100%' }}
+                        >
+                            Confirm Paid
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+      ) : activeRide ? (
         <div className="booking-panel glass-panel" style={{ border: '1px solid var(--primary)' }}>
             <h3 style={{ marginBottom: '16px', color: 'var(--primary)' }}>Ride In Progress</h3>
             <div style={{ marginBottom: '20px' }}>
@@ -145,6 +225,21 @@ const Home = () => {
       ) : (
         <div className="booking-panel glass-panel">
           <h3 style={{ marginBottom: '16px', fontSize: '1.25rem', fontWeight: '600' }}>Book a Ride</h3>
+          
+          {errorMessage && (
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <span style={{ fontWeight: '500' }}>{errorMessage}</span>
+                {errorMessage.toLowerCase().includes('balance') && (
+                    <button 
+                        onClick={() => navigate('/wallet')} 
+                        style={{ background: '#ef4444', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', alignSelf: 'flex-start', fontWeight: 'bold' }}
+                    >
+                        Top Up Wallet
+                    </button>
+                )}
+            </div>
+          )}
+
           <form onSubmit={handleBookRide}>
             <div className="input-group">
               <input 
