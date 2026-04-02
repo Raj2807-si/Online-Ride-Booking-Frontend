@@ -70,8 +70,8 @@ const Home = () => {
   const searchAddress = debounce(async (query, type) => {
     if (query.length < 3) return;
     try {
-        const response = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5`, {
-            headers: { 'User-Agent': 'Tripzo-Ride-Booking' }
+        const response = await axios.get(`${API_BASE_URL}/api/rides/geocode?q=${encodeURIComponent(query)}&limit=5`, {
+            headers: { Authorization: `Bearer ${token}` }
         });
         if (type === 'pickup') setPSuggestions(response.data);
         else setDSuggestions(response.data);
@@ -94,7 +94,9 @@ const Home = () => {
             return { lat: parseFloat(first.lat), lng: parseFloat(first.lon), name: first.display_name };
         }
         try {
-            const res = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+            const res = await axios.get(`${API_BASE_URL}/api/rides/geocode?q=${encodeURIComponent(query)}&limit=1`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (res.data && res.data.length > 0) {
                 return { lat: parseFloat(res.data[0].lat), lng: parseFloat(res.data[0].lon), name: res.data[0].display_name };
             }

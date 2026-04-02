@@ -70,7 +70,7 @@ const Map = ({ pickup, destination, driver }) => {
         if (pickup && destination) {
             const fetchRoute = async () => {
                 try {
-                    const response = await fetch(`http://router.project-osrm.org/route/v1/driving/${pickup.lng},${pickup.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson`);
+                    const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${pickup.lng},${pickup.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson`);
                     const data = await response.json();
                     if (data.code === 'Ok') {
                         // OSRM returns coordinates as [lng, lat], Leaflet needs [lat, lng]
