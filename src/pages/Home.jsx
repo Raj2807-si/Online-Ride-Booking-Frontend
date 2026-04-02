@@ -81,18 +81,61 @@ const Home = () => {
   const handleBookRide = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-    if (!pickupCoords || !destinationCoords) {
-        setErrorMessage('Please select valid locations from the suggestions.');
+    
+    let pCoords = pickupCoords;
+    let dCoords = destinationCoords;
+    let pName = pickup;
+    let dName = destination;
+
+    // Helper to geocode if coordinates are missing
+    const getCoords = async (query, suggestions) => {
+        if (suggestions && suggestions.length > 0) {
+            const first = suggestions[0];
+            return { lat: parseFloat(first.lat), lng: parseFloat(first.lon), name: first.display_name };
+        }
+        try {
+            const res = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+            if (res.data && res.data.length > 0) {
+                return { lat: parseFloat(res.data[0].lat), lng: parseFloat(res.data[0].lon), name: res.data[0].display_name };
+            }
+        } catch (err) { console.error('Auto-geocoding failed', err); }
+        return null;
+    };
+
+    setIsBooking(true);
+
+    if (!pCoords && pickup) {
+        const result = await getCoords(pickup, pSuggestions);
+        if (result) {
+            pCoords = { lat: result.lat, lng: result.lng };
+            pName = result.name;
+            setPickup(result.name);
+            setPickupCoords(pCoords);
+        }
+    }
+
+    if (!dCoords && destination) {
+        const result = await getCoords(destination, dSuggestions);
+        if (result) {
+            dCoords = { lat: result.lat, lng: result.lng };
+            dName = result.name;
+            setDestination(result.name);
+            setDestinationCoords(dCoords);
+        }
+    }
+
+    if (!pCoords || !dCoords) {
+        setErrorMessage('Could not find those locations. Please try again or select from the suggestions.');
+        setIsBooking(false);
         return;
     }
-    setIsBooking(true);
     
     try {
       await axios.post(`${API_BASE_URL}/api/rides/create`, {
-        pickup,
-        pickupCoords,
-        destination,
-        destinationCoords,
+        pickup: pName,
+        pickupCoords: pCoords,
+        destination: dName,
+        destinationCoords: dCoords,
         vehicleType
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -102,7 +145,8 @@ const Home = () => {
       setIsBooking(false);
       setPickup('');
       setDestination('');
-      // Keep coords for the map until accepted
+      setPickupCoords(null);
+      setDestinationCoords(null);
     } catch (err) {
        const msg = err.response?.data?.message || err.message || 'Error booking ride';
        setErrorMessage(msg);
