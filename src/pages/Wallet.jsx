@@ -9,6 +9,7 @@ const Wallet = () => {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [topupAmount, setTopupAmount] = useState('500');
 
   useEffect(() => {
     fetchWalletData();
@@ -41,7 +42,21 @@ const Wallet = () => {
           <h1 style={{ fontSize: '3rem', color: 'var(--primary)', marginBottom: '0' }}>₹{balance}</h1>
         </div>
         
-        <UPIPayment amount="500" />
+        <div className="glass-panel" style={{ padding: '30px' }}>
+          <h3 style={{ marginBottom: '15px' }}>Top-up Wallet</h3>
+          <div className="input-group" style={{ marginBottom: '15px' }}>
+            <label className="input-label">Amount (₹)</label>
+            <input 
+              type="number" 
+              className="input-field" 
+              value={topupAmount} 
+              onChange={(e) => setTopupAmount(e.target.value)}
+              min="10"
+              placeholder="Enter amount"
+            />
+          </div>
+          <UPIPayment amount={topupAmount} upiId="9006145808-3@ybl" />
+        </div>
       </div>
 
       <div className="glass-panel" style={{ padding: '20px' }}>

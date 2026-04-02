@@ -188,17 +188,27 @@ const Home = () => {
 
                 {showUPI && (
                     <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6', borderRadius: '12px', padding: '20px', textAlign: 'center', marginTop: '10px', animation: 'fadeIn 0.3s ease' }}>
-                        <p style={{ color: '#3b82f6', fontSize: '0.8rem', marginBottom: '10px' }}>Scan this QR or Pay to: <strong>tripzo@upi</strong></p>
-                        <div style={{ width: '150px', height: '150px', background: 'white', margin: '0 auto 15px', padding: '10px', borderRadius: '8px' }}>
-                           {/* Placeholder for QR - or just a box */}
-                           <div style={{ width: '100%', height: '100%', border: '4px dashed #3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold', fontSize: '0.9rem' }}>QR CODE</div>
+                        <p style={{ color: '#3b82f6', fontSize: '0.8rem', marginBottom: '10px' }}>Scan the QR code to pay ₹{completedRide.fare}</p>
+                        <div style={{ width: '180px', height: '180px', background: 'white', margin: '0 auto 15px', padding: '10px', borderRadius: '12px' }}>
+                           <img 
+                             src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`upi://pay?pa=9006145808-3@ybl&pn=Tripzo&am=${completedRide.fare}&cu=INR`)}`} 
+                             alt="UPI QR Code" 
+                             style={{ width: '100%', height: '100%' }}
+                           />
                         </div>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '15px' }}>UPI ID: <strong>9006145808-3@ybl</strong></p>
                         <button 
                             onClick={() => handleProcessPayment('upi')} 
                             className="btn-primary" 
                             style={{ background: '#3b82f6', border: 'none', width: '100%' }}
                         >
-                            Confirm Paid
+                            Confirm Payment
+                        </button>
+                        <button 
+                            onClick={() => setShowUPI(false)} 
+                            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', marginTop: '10px', fontSize: '0.8rem', cursor: 'pointer' }}
+                        >
+                            Cancel
                         </button>
                     </div>
                 )}

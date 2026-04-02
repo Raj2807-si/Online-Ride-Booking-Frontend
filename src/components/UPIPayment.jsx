@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-const UPIPayment = ({ amount, upiId = "merchant@upi" }) => {
+const UPIPayment = ({ amount, upiId = "9006145808-3@ybl" }) => {
   const [showQR, setShowQR] = useState(false);
   const upiUri = `upi://pay?pa=${upiId}&pn=Tripzo&am=${amount}&cu=INR`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUri)}`;
