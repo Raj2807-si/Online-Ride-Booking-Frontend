@@ -297,7 +297,7 @@ const Home = () => {
           )}
 
           <form onSubmit={handleBookRide}>
-            <div className="input-group">
+            <div className="input-group" style={{ position: 'relative' }}>
               <input 
                 type="text" 
                 className="input-field" 
@@ -307,20 +307,48 @@ const Home = () => {
                 required 
               />
               {pSuggestions.length > 0 && (
-                  <ul className="glass-panel" style={{ position: 'absolute', width: '100%', zIndex: 10, listStyle: 'none', padding: '10px', marginTop: '5px', maxHeight: '200px', overflowY: 'auto' }}>
+                  <ul className="glass-panel" style={{ 
+                    position: 'absolute', 
+                    top: '100%', 
+                    left: 0, 
+                    right: 0, 
+                    zIndex: 2000, 
+                    listStyle: 'none', 
+                    padding: '8px', 
+                    marginTop: '8px', 
+                    maxHeight: '240px', 
+                    overflowY: 'auto',
+                    border: '1px solid var(--primary)',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                  }}>
                       {pSuggestions.map((s) => (
                           <li key={s.place_id} onClick={() => { 
                               setPickup(s.display_name); 
                               setPickupCoords({ lat: parseFloat(s.lat), lng: parseFloat(s.lon) });
                               setPSuggestions([]); 
-                          }} style={{ padding: '8px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.85rem' }}>
-                              {s.display_name}
+                          }} style={{ 
+                            padding: '12px 16px', 
+                            cursor: 'pointer', 
+                            borderBottom: '1px solid rgba(255,255,255,0.05)', 
+                            fontSize: '0.9rem',
+                            borderRadius: '8px',
+                            transition: 'background 0.2s ease',
+                            marginBottom: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px'
+                          }}
+                          onMouseEnter={(e) => e.target.style.background = 'rgba(250, 204, 21, 0.1)'}
+                          onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                          >
+                              <MapPin size={16} color="var(--primary)" />
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.display_name}</span>
                           </li>
                       ))}
                   </ul>
               )}
             </div>
-            <div className="input-group">
+            <div className="input-group" style={{ position: 'relative' }}>
               <input 
                 type="text" 
                 className="input-field" 
@@ -330,14 +358,42 @@ const Home = () => {
                 required 
               />
               {dSuggestions.length > 0 && (
-                  <ul className="glass-panel" style={{ position: 'absolute', width: '100%', zIndex: 10, listStyle: 'none', padding: '10px', marginTop: '5px', maxHeight: '200px', overflowY: 'auto' }}>
+                  <ul className="glass-panel" style={{ 
+                    position: 'absolute', 
+                    top: '100%', 
+                    left: 0, 
+                    right: 0, 
+                    zIndex: 2000, 
+                    listStyle: 'none', 
+                    padding: '8px', 
+                    marginTop: '8px', 
+                    maxHeight: '240px', 
+                    overflowY: 'auto',
+                    border: '1px solid var(--primary)',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                  }}>
                       {dSuggestions.map((s) => (
                           <li key={s.place_id} onClick={() => { 
                               setDestination(s.display_name); 
                               setDestinationCoords({ lat: parseFloat(s.lat), lng: parseFloat(s.lon) });
                               setDSuggestions([]); 
-                          }} style={{ padding: '8px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.85rem' }}>
-                              {s.display_name}
+                          }} style={{ 
+                            padding: '12px 16px', 
+                            cursor: 'pointer', 
+                            borderBottom: '1px solid rgba(255,255,255,0.05)', 
+                            fontSize: '0.9rem',
+                            borderRadius: '8px',
+                            transition: 'background 0.2s ease',
+                            marginBottom: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px'
+                          }}
+                          onMouseEnter={(e) => e.target.style.background = 'rgba(250, 204, 21, 0.1)'}
+                          onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                          >
+                              <Navigation size={16} color="var(--primary)" />
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.display_name}</span>
                           </li>
                       ))}
                   </ul>
