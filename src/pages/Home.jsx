@@ -7,6 +7,7 @@ import { io } from 'socket.io-client';
 import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 import debounce from 'lodash.debounce';
+import RideHistory from '../components/RideHistory';
 
 const Home = () => {
   const [pickup, setPickup] = useState('');
@@ -26,14 +27,26 @@ const Home = () => {
   const [paymentPhase, setPaymentPhase] = useState(false);
   const [completedRide, setCompletedRide] = useState(null);
   const [showUPI, setShowUPI] = useState(false);
+  const [history, setHistory] = useState([]);
   const navigate = useNavigate();
   const { user, token, logout } = useAuth();
 
-  useEffect(() => {
+    const fetchHistory = async () => {
+        try {
+            const res = await axios.get(`${API_BASE_URL}/api/rides/history/rider`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setHistory(res.data);
+        } catch (err) { console.error('Error fetching history', err); }
+    };
+    
+    useEffect(() => {
     if (!token) {
       navigate('/login');
       return;
     }
+
+    fetchHistory();
 
     const newSocket = io(`${API_BASE_URL}`, {
        auth: { token }
@@ -63,6 +76,8 @@ const Home = () => {
             setDriverLocation({ lat: data.lat, lng: data.lng });
         }
     });
+
+    fetchHistory();
 
     return () => newSocket.disconnect();
   }, [navigate, token, user, activeRide]);
@@ -422,6 +437,32 @@ const Home = () => {
               {isBooking ? 'Finding Nearest Driver...' : 'Request Tripzo'}
             </button>
           </form>
+
+          {/* Persistent Recent Activity Section */}
+          <div style={{ marginTop: '30px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h4 style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Recent Activity</h4>
+                <button 
+                    onClick={() => {
+                        const fetchHistory = async () => {
+                            try {
+                                const res = await axios.get(`${API_BASE_URL}/api/rides/history/rider`, {
+                                    headers: { Authorization: `Bearer ${token}` }
+                                });
+                                setHistory(res.data);
+                            } catch (err) { console.error('Error fetching history', err); }
+                        };
+                        fetchHistory();
+                    }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                    Refresh
+                </button>
+             </div>
+             <div style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
+                <RideHistory rides={history} title={null} />
+             </div>
+          </div>
         </div>
       )}
     </div>

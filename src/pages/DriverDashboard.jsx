@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MapPin, Settings, Bell, Power, Navigation2 } from 'lucide-react';
+import { LayoutDashboard, MapPin, Settings, Bell, Power, Navigation2, History } from 'lucide-react';
+import RideHistory from '../components/RideHistory';
 import { 
   ResponsiveContainer, 
   AreaChart, 
@@ -34,6 +35,13 @@ const DriverDashboard = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [socket, setSocket] = useState(null);
   const [paymentConfirmed, setPaymentConfirmed] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const activeRideRef = useRef(activeRide);
+
+  useEffect(() => {
+    activeRideRef.current = activeRide;
+  }, [activeRide]);
 
   useEffect(() => {
     if (!token || role !== 'driver') {
@@ -49,13 +57,24 @@ const DriverDashboard = () => {
         setEarnings(response.data.earnings);
       } catch (err) { console.error('Error fetching earnings', err); }
     };
+    
+    const fetchHistory = async () => {
+      try {
+          const res = await axios.get(`${API_BASE_URL}/api/rides/history/captain`, {
+              headers: { Authorization: `Bearer ${token}` }
+          });
+          setHistory(res.data);
+      } catch (err) { console.error('Error fetching history', err); }
+    };
+
     fetchEarnings();
+    fetchHistory();
 
     const newSocket = io(`${API_BASE_URL}`, { auth: { token } });
     setSocket(newSocket);
 
     newSocket.on('new_ride_request', (ride) => {
-        if (!activeRide) setNewRide(ride);
+        if (!activeRideRef.current) setNewRide(ride);
     });
 
     newSocket.on(`payment_confirmed_${user?.id}`, (data) => {
@@ -64,7 +83,7 @@ const DriverDashboard = () => {
     });
 
     return () => newSocket.disconnect();
-  }, [token, role, navigate, activeRide]);
+  }, [token, role, navigate]);
 
   const handleToggleStatus = async () => {
     try {
@@ -119,8 +138,20 @@ const DriverDashboard = () => {
       <div className="sidebar glass-panel">
         <div className="logo" style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold' }}>Tripzo</div>
         <nav>
-          <div className="nav-item active"><LayoutDashboard size={20} /> Dashboard</div>
-          <div className="nav-item"><MapPin size={20} /> Today's Rides</div>
+          <div 
+            onClick={() => setActiveTab('dashboard')} 
+            className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+            style={{ cursor: 'pointer' }}
+          >
+            <LayoutDashboard size={20} /> Dashboard
+          </div>
+          <div 
+            onClick={() => setActiveTab('history')} 
+            className={`nav-item ${activeTab === 'history' ? 'active' : ''}`}
+            style={{ cursor: 'pointer' }}
+          >
+            <History size={20} /> Ride History
+          </div>
           <div className="nav-item"><Settings size={20} /> Settings</div>
         </nav>
 
@@ -247,26 +278,85 @@ const DriverDashboard = () => {
           </div>
         )}
 
-        <div className="glass-panel" style={{ height: '300px', padding: '20px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data}>
-                    <defs>
-                        <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
-                        </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
-                    <Tooltip 
-                        contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                        itemStyle={{ color: 'var(--primary)' }}
-                    />
-                    <Area type="monotone" dataKey="earnings" stroke="var(--primary)" fillOpacity={1} fill="url(#colorEarnings)" />
-                </AreaChart>
-            </ResponsiveContainer>
-        </div>
+        {activeTab === 'dashboard' ? (
+          <>
+          <div className="glass-panel" style={{ height: '300px', padding: '20px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={data}>
+                      <defs>
+                          <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                          </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
+                      <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
+                      <Tooltip 
+                          contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                          itemStyle={{ color: 'var(--primary)' }}
+                      />
+                      <Area type="monotone" dataKey="earnings" stroke="var(--primary)" fillOpacity={1} fill="url(#colorEarnings)" />
+                  </AreaChart>
+              </ResponsiveContainer>
+          </div>
+          
+          <div style={{ marginTop: '30px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '1.2rem' }}>Recent Trips</h3>
+                <button 
+                  onClick={() => {
+                    const fetchHistory = async () => {
+                      try {
+                          const res = await axios.get(`${API_BASE_URL}/api/rides/history/captain`, {
+                              headers: { Authorization: `Bearer ${token}` }
+                          });
+                          setHistory(res.data);
+                      } catch (err) { console.error('Error fetching history', err); }
+                    };
+                    fetchHistory();
+                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.85rem' }}
+                >
+                  Refresh
+                </button>
+            </div>
+            <RideHistory rides={history.slice(0, 5)} title={null} />
+            {history.length > 5 && (
+              <button 
+                onClick={() => setActiveTab('history')}
+                style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '12px', color: 'var(--primary)', marginTop: '10px', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                View All History
+              </button>
+            )}
+          </div>
+        </>
+        ) : (
+          <div style={{ animation: 'fadeIn 0.3s ease' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '1.5rem' }}>Full Ride History</h2>
+              <button 
+                onClick={() => {
+                  const fetchHistory = async () => {
+                    try {
+                        const res = await axios.get(`${API_BASE_URL}/api/rides/history/captain`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        setHistory(res.data);
+                    } catch (err) { console.error('Error fetching history', err); }
+                  };
+                  fetchHistory();
+                }}
+                className="glass-panel"
+                style={{ padding: '8px 15px', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}
+              >
+                Refresh
+              </button>
+            </div>
+            <RideHistory rides={history} title={null} />
+          </div>
+        )}
       </div>
     </div>
   );
