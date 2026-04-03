@@ -69,6 +69,10 @@ const Home = () => {
 
   const searchAddress = debounce(async (query, type) => {
     if (query.length < 3) return;
+    // Clear other suggestions to avoid overlap
+    if (type === 'pickup') setDSuggestions([]);
+    else setPSuggestions([]);
+    
     try {
         const response = await axios.get(`${API_BASE_URL}/api/rides/geocode?q=${encodeURIComponent(query)}&limit=5`, {
             headers: { Authorization: `Bearer ${token}` }
@@ -322,27 +326,31 @@ const Home = () => {
                     boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
                   }}>
                       {pSuggestions.map((s) => (
-                          <li key={s.place_id} onClick={() => { 
-                              setPickup(s.display_name); 
-                              setPickupCoords({ lat: parseFloat(s.lat), lng: parseFloat(s.lon) });
-                              setPSuggestions([]); 
-                          }} style={{ 
-                            padding: '12px 16px', 
-                            cursor: 'pointer', 
-                            borderBottom: '1px solid rgba(255,255,255,0.05)', 
-                            fontSize: '0.9rem',
-                            borderRadius: '8px',
-                            transition: 'background 0.2s ease',
-                            marginBottom: '4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px'
-                          }}
-                          onMouseEnter={(e) => e.target.style.background = 'rgba(250, 204, 21, 0.1)'}
-                          onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                          <li key={s.place_id} 
+                            onMouseDown={() => { 
+                                setPickup(s.display_name); 
+                                setPickupCoords({ lat: parseFloat(s.lat), lng: parseFloat(s.lon) });
+                                setPSuggestions([]); 
+                            }} 
+                            style={{ 
+                              padding: '12px 16px', 
+                              cursor: 'pointer', 
+                              borderBottom: '1px solid rgba(255,255,255,0.05)', 
+                              fontSize: '0.9rem',
+                              borderRadius: '8px',
+                              transition: 'background 0.2s ease',
+                              marginBottom: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px',
+                              width: '100%',
+                              backgroundColor: 'transparent'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(250, 204, 21, 0.15)'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                           >
-                              <MapPin size={16} color="var(--primary)" />
-                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.display_name}</span>
+                              <MapPin size={18} color="var(--primary)" style={{ flexShrink: 0 }} />
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', pointerEvents: 'none' }}>{s.display_name}</span>
                           </li>
                       ))}
                   </ul>
@@ -373,27 +381,31 @@ const Home = () => {
                     boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
                   }}>
                       {dSuggestions.map((s) => (
-                          <li key={s.place_id} onClick={() => { 
-                              setDestination(s.display_name); 
-                              setDestinationCoords({ lat: parseFloat(s.lat), lng: parseFloat(s.lon) });
-                              setDSuggestions([]); 
-                          }} style={{ 
-                            padding: '12px 16px', 
-                            cursor: 'pointer', 
-                            borderBottom: '1px solid rgba(255,255,255,0.05)', 
-                            fontSize: '0.9rem',
-                            borderRadius: '8px',
-                            transition: 'background 0.2s ease',
-                            marginBottom: '4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px'
-                          }}
-                          onMouseEnter={(e) => e.target.style.background = 'rgba(250, 204, 21, 0.1)'}
-                          onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                          <li key={s.place_id} 
+                            onMouseDown={() => { 
+                                setDestination(s.display_name); 
+                                setDestinationCoords({ lat: parseFloat(s.lat), lng: parseFloat(s.lon) });
+                                setDSuggestions([]); 
+                            }} 
+                            style={{ 
+                              padding: '12px 16px', 
+                              cursor: 'pointer', 
+                              borderBottom: '1px solid rgba(255,255,255,0.05)', 
+                              fontSize: '0.9rem',
+                              borderRadius: '8px',
+                              transition: 'background 0.2s ease',
+                              marginBottom: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px',
+                              width: '100%',
+                              backgroundColor: 'transparent'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(250, 204, 21, 0.15)'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                           >
-                              <Navigation size={16} color="var(--primary)" />
-                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.display_name}</span>
+                              <Navigation size={18} color="var(--primary)" style={{ flexShrink: 0 }} />
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', pointerEvents: 'none' }}>{s.display_name}</span>
                           </li>
                       ))}
                   </ul>
