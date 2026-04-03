@@ -9,7 +9,7 @@ const getBaseUrl = () => {
   }
   
   // Default production backend URL
-  return 'https://online-ride-booking-backend.vercel.app';
+  return 'https://online-ride-booking-backend.onrender.com';
 };
 
 const BASE_URL = getBaseUrl();
