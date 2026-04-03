@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, MapPin, Clock, CreditCard } from 'lucide-react';
+import { Calendar, MapPin, Clock, CreditCard, Star } from 'lucide-react';
 
 const RideHistory = ({ rides, title = "Ride History" }) => {
   if (!rides || rides.length === 0) {
@@ -57,16 +57,23 @@ const RideHistory = ({ rides, title = "Ride History" }) => {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--primary)' }}>₹{ride.fare}</div>
-                <div style={{ 
-                  fontSize: '0.7rem', 
-                  padding: '2px 8px', 
-                  borderRadius: '10px',
-                  background: ride.paymentStatus === 'paid' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                  color: ride.paymentStatus === 'paid' ? '#4ade80' : '#f87171',
-                  display: 'inline-block',
-                  marginTop: '4px'
-                }}>
-                  {ride.paymentStatus.toUpperCase()}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+                  <span style={{ 
+                    fontSize: '0.7rem', 
+                    padding: '2px 8px', 
+                    borderRadius: '10px',
+                    background: ride.status === 'completed' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                    color: ride.status === 'completed' ? '#4ade80' : '#f87171',
+                    display: 'inline-block'
+                  }}>
+                    {ride.status.toUpperCase()}
+                  </span>
+                  {ride.rating && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: 'var(--primary)' }}>
+                      <Star size={14} fill="var(--primary)" />
+                      <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>{ride.rating}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

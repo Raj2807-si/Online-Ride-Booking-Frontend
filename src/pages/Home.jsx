@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Map from '../components/Map';
-import { LogOut, Navigation, MapPin } from 'lucide-react';
+import { LogOut, Navigation, MapPin, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
@@ -28,6 +28,9 @@ const Home = () => {
   const [completedRide, setCompletedRide] = useState(null);
   const [showUPI, setShowUPI] = useState(false);
   const [history, setHistory] = useState([]);
+  const [ratingPhase, setRatingPhase] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [feedback, setFeedback] = useState('');
   const navigate = useNavigate();
   const { user, token, logout } = useAuth();
 
@@ -183,15 +186,36 @@ const Home = () => {
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
-      alert(`Payment successful via ${method.toUpperCase()}!`);
-      setShowUPI(false);
+      alert('Payment Successful!');
       setPaymentPhase(false);
-      setCompletedRide(null);
-      // Refresh to update balance view
-      window.location.reload(); 
+      setRatingPhase(true); // Transition to rating
+      fetchHistory();
     } catch (err) {
-      alert(err.response?.data?.message || 'Payment failed. Please try again.');
+      alert('Payment Failed: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleSubmitRating = async () => {
+    if (rating === 0) {
+        alert('Please select a star rating first.');
+        return;
+    }
+    try {
+        await axios.post(`${API_BASE_URL}/api/rides/rate/${completedRide._id}`, {
+            rating,
+            feedback
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        alert('Thank you for your feedback!');
+        setRatingPhase(false);
+        setCompletedRide(null);
+        setRating(0);
+        setFeedback('');
+        fetchHistory();
+    } catch (err) {
+        console.error('Error submitting rating', err);
+        alert('Failed to submit rating.');
     }
   };
 
@@ -463,6 +487,69 @@ const Home = () => {
                 <RideHistory rides={history} title={null} />
              </div>
           </div>
+        </div>
+      )}
+
+      {/* Rating Phase */}
+      {ratingPhase && (
+        <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 1002,
+            width: '90%',
+            maxWidth: '400px'
+        }}>
+            <div className="glass-panel" style={{ padding: '30px', textAlign: 'center' }}>
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Rate Your Trip</h2>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>How was your ride with {completedRide.captain?.fullname?.firstname}?</p>
+                
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                        <Star 
+                            key={star}
+                            size={32}
+                            fill={rating >= star ? "var(--primary)" : "none"}
+                            color={rating >= star ? "var(--primary)" : "var(--text-muted)"}
+                            style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                            onClick={() => setRating(star)}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        />
+                    ))}
+                </div>
+
+                <textarea 
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    placeholder="Tell us more about your experience... (optional)"
+                    style={{
+                        width: '100%',
+                        height: '100px',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        color: 'white',
+                        marginBottom: '20px',
+                        resize: 'none'
+                    }}
+                />
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <button onClick={handleSubmitRating} className="btn-primary">Submit Rating</button>
+                    <button 
+                        onClick={() => {
+                            setRatingPhase(false);
+                            setCompletedRide(null);
+                        }} 
+                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', padding: '10px', cursor: 'pointer' }}
+                    >
+                        Skip for now
+                    </button>
+                </div>
+            </div>
         </div>
       )}
     </div>
