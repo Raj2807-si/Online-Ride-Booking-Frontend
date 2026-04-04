@@ -133,11 +133,11 @@ const DriverDashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      {/* Sidebar */}
+    <div className="dashboard-container u-stack-mobile">
+      {/* Sidebar / Top Navigation for Mobile */}
       <div className="sidebar glass-panel">
-        <div className="logo" style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold' }}>Tripzo</div>
-        <nav>
+        <div className="logo" style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '40px' }}>Tripzo</div>
+        <nav className="u-hide-mobile">
           <div 
             onClick={() => setActiveTab('dashboard')} 
             className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
@@ -156,11 +156,11 @@ const DriverDashboard = () => {
         </nav>
 
         <div className="nav-user" style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-           <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold', flexShrink: 0 }}>
+           <div style={{ width: '42px', height: '42px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold', flexShrink: 0 }}>
              {user?.fullname?.firstname?.[0] || 'D'}
            </div>
            <div className="u-hide-mobile">
-             <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{user?.fullname?.firstname} {user?.fullname?.lastname}</div>
+             <div style={{ fontSize: '0.9rem', fontWeight: '600', color: 'white' }}>{user?.fullname?.firstname}</div>
              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{isOnline ? 'Online' : 'Offline'}</div>
            </div>
         </div>
@@ -168,9 +168,9 @@ const DriverDashboard = () => {
 
       {/* Main Content */}
       <div className="main-content">
-        <header className="u-stack-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px', gap: '20px' }}>
-          <h2 style={{ fontSize: '1.75rem' }}>Welcome back, {user?.fullname?.firstname}!</h2>
-          <div style={{ display: 'flex', gap: '15px', width: 'auto' }}>
+        <header className="u-stack-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', gap: '20px' }}>
+          <h2 className="u-title-mobile" style={{ fontSize: '1.6rem', fontWeight: 'bold' }}>Welcome, {user?.fullname?.firstname}!</h2>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             <button 
                 onClick={handleToggleStatus}
                 className="glass-panel" 
@@ -180,80 +180,100 @@ const DriverDashboard = () => {
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '8px',
-                    padding: '8px 20px',
-                    cursor: 'pointer'
+                    padding: '10px 20px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '0.9rem'
                 }}
             >
               <Power size={18} color={isOnline ? '#4ade80' : '#f87171'} />
-              {isOnline ? 'Go Offline' : 'Go Online'}
+              <span className="u-hide-mobile">{isOnline ? 'Go Offline' : 'Go Online'}</span>
+              {!isOnline && <span className="u-show-mobile">Go Online</span>}
+              {isOnline && <span className="u-show-mobile">Online</span>}
             </button>
-            <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px' }}>
+            <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px' }}>
               <Bell size={20} />
             </div>
           </div>
         </header>
 
         {paymentConfirmed && (
-            <div className="glass-panel" style={{ background: 'rgba(74, 222, 128, 0.1)', border: '1px solid #4ade80', color: '#4ade80', padding: '15px', borderRadius: '12px', marginBottom: '30px', textAlign: 'center', animation: 'fadeIn 0.3s ease' }}>
-                <strong style={{ display: 'block', fontSize: '1.1rem' }}>🎉 Payment Confirmed!</strong>
-                <span style={{ fontSize: '0.9rem' }}>The rider paid via {paymentConfirmed.paymentMethod.toUpperCase()}</span>
+            <div className="glass-panel" style={{ background: 'rgba(74, 222, 128, 0.1)', border: '1px solid #4ade80', color: '#4ade80', padding: '16px', borderRadius: '12px', marginBottom: '32px', textAlign: 'center', animation: 'slideDown 0.3s ease' }}>
+                <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '4px' }}>🎉 Payment Confirmed!</strong>
+                <span style={{ fontSize: '0.85rem' }}>The rider paid ₹{paymentConfirmed.amount} via {paymentConfirmed.paymentMethod.toUpperCase()}</span>
             </div>
         )}
 
-        {/* New Ride Request Modal */}
+        {/* New Ride Request Card (Centered on Mobile) */}
         {newRide && (
-            <div className="glass-panel" style={{ position: 'fixed', bottom: 20, right: 20, width: '350px', padding: '20px', zIndex: 1000, borderLeft: '5px solid var(--primary)', animation: 'slideIn 0.3s ease' }}>
-                <h4 style={{ marginBottom: '10px', color: 'var(--primary)' }}>New Ride Request!</h4>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>₹{newRide.fare}</p>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{newRide.distance / 1000} km</p>
+            <div className="glass-panel" style={{ 
+                position: 'fixed', 
+                bottom: '80px', 
+                left: '50%', 
+                transform: 'translateX(-50%)', 
+                width: '90%', 
+                maxWidth: '420px', 
+                padding: '24px', 
+                zIndex: 1100, 
+                border: '2px solid var(--primary)', 
+                boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
+                animation: 'slideUp 0.3s ease' 
+            }}>
+                <h4 style={{ marginBottom: '12px', color: 'var(--primary)', fontSize: '1.1rem', fontWeight: 'bold' }}>New Trip Request!</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <p style={{ fontSize: '1.8rem', fontWeight: '800' }}>₹{newRide.fare}</p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{newRide.distance / 1000} km estimate</p>
                 </div>
-                <div style={{ margin: '15px 0' }}>
-                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                        <MapPin size={16} color="var(--primary)" />
-                        <p style={{ fontSize: '0.9rem' }}>{newRide.pickup}</p>
+                <div style={{ marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+                        <MapPin size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+                        <p style={{ fontSize: '0.95rem', lineHeight: '1.4' }}><span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', display: 'block' }}>PICKUP</span>{newRide.pickup}</p>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-                    <button onClick={handleAcceptRide} className="btn-primary" style={{ flex: 1 }}>Accept</button>
-                    <button onClick={() => setNewRide(null)} className="glass-panel" style={{ flex: 1, color: '#f87171' }}>Reject</button>
+                <div className="u-flex" style={{ gap: '12px' }}>
+                    <button onClick={handleAcceptRide} className="btn-primary" style={{ flex: 1.5, padding: '14px' }}>Accept Trip</button>
+                    <button onClick={() => setNewRide(null)} className="glass-panel" style={{ flex: 1, color: '#f87171', border: '1px solid rgba(248, 113, 113, 0.2)' }}>Reject</button>
                 </div>
             </div>
         )}
 
         {/* Active Ride View */}
         {activeRide ? (
-            <div className="glass-panel" style={{ padding: '30px', marginBottom: '30px', border: '1px solid var(--primary)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><Navigation2 size={24} /> {activeRide.status === 'ongoing' ? 'Ride in Progress' : 'Collect OTP to Start'}</h3>
-                    <div style={{ padding: '5px 15px', background: activeRide.status === 'ongoing' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(251, 191, 36, 0.2)', color: activeRide.status === 'ongoing' ? '#4ade80' : '#fbbf24', borderRadius: '12px', fontSize: '0.8rem' }}>
+            <div className="glass-panel" style={{ padding: '30px', marginBottom: '32px', border: '1.5px solid var(--primary)' }}>
+                <div className="u-flex-between u-stack-mobile" style={{ marginBottom: '24px', gap: '15px' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.3rem' }}><Navigation2 size={24} color="var(--primary)" /> {activeRide.status === 'ongoing' ? 'Ongoing Trip' : 'Awaiting OTP'}</h3>
+                    <div style={{ padding: '6px 16px', background: activeRide.status === 'ongoing' ? 'rgba(74, 222, 128, 0.1)' : 'rgba(251, 191, 36, 0.1)', color: activeRide.status === 'ongoing' ? '#4ade80' : '#fbbf24', borderRadius: '100px', fontSize: '0.8rem', fontWeight: '600' }}>
                         {activeRide.status.toUpperCase()}
                     </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                <div className="u-grid u-grid-2" style={{ gap: '30px' }}>
                     <div>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>FROM</p>
-                        <p style={{ fontSize: '1.1rem', marginBottom: '15px' }}>{activeRide.pickup}</p>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>TO</p>
-                        <p style={{ fontSize: '1.1rem' }}>{activeRide.destination}</p>
+                        <div style={{ marginBottom: '20px' }}>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '6px' }}>PICKUP LOCATION</p>
+                          <p style={{ fontSize: '1rem', fontWeight: '500' }}>{activeRide.pickup}</p>
+                        </div>
+                        <div>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '6px' }}>DESTINATION</p>
+                          <p style={{ fontSize: '1rem', fontWeight: '500' }}>{activeRide.destination}</p>
+                        </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div className="glass-panel" style={{ padding: '24px', background: 'rgba(255,255,255,0.02)' }}>
                         {activeRide.status === 'accepted' ? (
                             <form onSubmit={(e) => {
                                 e.preventDefault();
                                 handleStartRide(e.target.otp.value);
                             }}>
-                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '10px' }}>ENTER RIDER OTP</p>
-                                <input name="otp" className="input-field" placeholder="123456" style={{ textAlign: 'center', fontSize: '1.5rem', letterSpacing: '4px', marginBottom: '15px' }} required />
-                                <button type="submit" className="btn-primary">Verify & Start Ride</button>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px', textAlign: 'center' }}>ENTER RIDER'S OTP</p>
+                                <input name="otp" className="input-field" placeholder="000000" style={{ textAlign: 'center', fontSize: '1.8rem', letterSpacing: '8px', marginBottom: '20px', fontWeight: 'bold' }} required />
+                                <button type="submit" className="btn-primary" style={{ padding: '14px' }}>Verify & Start Trip</button>
                             </form>
                         ) : (
                             <div style={{ textAlign: 'center' }}>
-                                <div className="glass-panel" style={{ padding: '20px', marginBottom: '20px' }}>
-                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Fare amount to collect</p>
-                                    <h2 style={{ fontSize: '2.5rem' }}>₹{activeRide.fare}</h2>
+                                <div style={{ marginBottom: '24px' }}>
+                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Total Fare</p>
+                                    <h2 style={{ fontSize: '2.8rem', fontWeight: '800' }}>₹{activeRide.fare}</h2>
                                 </div>
-                                <button onClick={handleCompleteRide} className="btn-primary">Complete & Collect Fare</button>
+                                <button onClick={handleCompleteRide} className="btn-primary" style={{ padding: '14px' }}>Complete & Collect Fare</button>
                             </div>
                         )}
                     </div>
@@ -261,27 +281,27 @@ const DriverDashboard = () => {
             </div>
         ) : (
           /* Stats Grid */
-          /* Stats Grid */
-          <div className="u-grid u-grid-3" style={{ marginBottom: '30px' }}>
-            <div className="glass-panel" style={{ padding: '20px' }}>
-              <div style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>Total Earnings</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>₹{earnings}</div>
+          <div className="u-grid u-grid-3" style={{ marginBottom: '32px', gap: '20px' }}>
+            <div className="glass-panel" style={{ padding: '24px' }}>
+              <div style={{ color: 'var(--text-muted)', marginBottom: '12px', fontSize: '0.85rem' }}>Total Earnings</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)' }}>₹{earnings}</div>
             </div>
-            <div className="glass-panel" style={{ padding: '20px' }}>
-              <div style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>Status</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: isOnline ? '#4ade80' : '#f87171' }}>{isOnline ? 'Online' : 'Offline'}</div>
+            <div className="glass-panel" style={{ padding: '24px' }}>
+              <div style={{ color: 'var(--text-muted)', marginBottom: '12px', fontSize: '0.85rem' }}>Current Status</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', color: isOnline ? '#4ade80' : '#f87171' }}>{isOnline ? 'Online' : 'Offline'}</div>
             </div>
-            <div className="glass-panel" style={{ padding: '20px' }}>
-              <div style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>Rating</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>⭐ 4.98</div>
+            <div className="glass-panel" style={{ padding: '24px' }}>
+              <div style={{ color: 'var(--text-muted)', marginBottom: '12px', fontSize: '0.85rem' }}>Driver Rating</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800' }}>⭐ 4.98</div>
             </div>
           </div>
         )}
 
         {activeTab === 'dashboard' ? (
           <>
-          <div className="glass-panel" style={{ height: '300px', padding: '20px' }}>
-              <ResponsiveContainer width="100%" height="100%">
+          <div className="glass-panel" style={{ height: '320px', padding: '24px', marginBottom: '32px' }}>
+              <h4 style={{ marginBottom: '20px', fontSize: '1rem', color: 'var(--text-muted)' }}>Weekly Performance</h4>
+              <ResponsiveContainer width="100%" height="85%">
                   <AreaChart data={data}>
                       <defs>
                           <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
@@ -290,20 +310,20 @@ const DriverDashboard = () => {
                           </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
-                      <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 11}} />
+                      <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 11}} />
                       <Tooltip 
-                          contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                          contentStyle={{ backgroundColor: 'rgba(18,18,18,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px' }}
                           itemStyle={{ color: 'var(--primary)' }}
                       />
-                      <Area type="monotone" dataKey="earnings" stroke="var(--primary)" fillOpacity={1} fill="url(#colorEarnings)" />
+                      <Area type="monotone" dataKey="earnings" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorEarnings)" />
                   </AreaChart>
               </ResponsiveContainer>
           </div>
           
-          <div style={{ marginTop: '30px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '1.2rem' }}>Recent Trips</h3>
+          <div>
+            <div className="u-flex-between" style={{ marginBottom: '20px' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Recent Trips</h3>
                 <button 
                   onClick={() => {
                     const fetchHistory = async () => {
@@ -316,26 +336,26 @@ const DriverDashboard = () => {
                     };
                     fetchHistory();
                   }}
-                  style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.85rem' }}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600' }}
                 >
-                  Refresh
+                  Refresh Log
                 </button>
             </div>
             <RideHistory rides={history.slice(0, 5)} title={null} />
             {history.length > 5 && (
               <button 
                 onClick={() => setActiveTab('history')}
-                style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '12px', color: 'var(--primary)', marginTop: '10px', cursor: 'pointer', fontWeight: 'bold' }}
+                style={{ width: '100%', padding: '16px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '12px', color: 'var(--primary)', marginTop: '16px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}
               >
-                View All History
+                View Full History
               </button>
             )}
           </div>
         </>
         ) : (
           <div style={{ animation: 'fadeIn 0.3s ease' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '1.5rem' }}>Full Ride History</h2>
+            <div className="u-flex-between" style={{ marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: 'bold' }}>All History</h2>
               <button 
                 onClick={() => {
                   const fetchHistory = async () => {
@@ -349,14 +369,43 @@ const DriverDashboard = () => {
                   fetchHistory();
                 }}
                 className="glass-panel"
-                style={{ padding: '8px 15px', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}
+                style={{ padding: '8px 16px', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.85rem' }}
               >
-                Refresh
+                Sync Data
               </button>
             </div>
             <RideHistory rides={history} title={null} />
           </div>
         )}
+      </div>
+
+      {/* Mobile Bottom Nav */}
+      <div className="u-show-mobile glass-panel" style={{ 
+        position: 'fixed', 
+        bottom: 0, 
+        left: 0, 
+        right: 0, 
+        height: '70px', 
+        zIndex: 1002, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-around',
+        borderRadius: '20px 20px 0 0',
+        padding: '0 10px',
+        borderTop: '1px solid rgba(255,255,255,0.05)'
+      }}>
+        <div onClick={() => setActiveTab('dashboard')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: activeTab === 'dashboard' ? 'var(--primary)' : 'var(--text-muted)' }}>
+          <LayoutDashboard size={20} />
+          <span style={{ fontSize: '0.7rem' }}>Home</span>
+        </div>
+        <div onClick={() => setActiveTab('history')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: activeTab === 'history' ? 'var(--primary)' : 'var(--text-muted)' }}>
+          <History size={20} />
+          <span style={{ fontSize: '0.7rem' }}>History</span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
+          <Settings size={20} />
+          <span style={{ fontSize: '0.7rem' }}>Setup</span>
+        </div>
       </div>
     </div>
   );

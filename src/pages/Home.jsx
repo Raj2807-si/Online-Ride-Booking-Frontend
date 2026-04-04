@@ -222,15 +222,17 @@ const Home = () => {
   return (
     <div className="map-container">
       {/* Absolute Header */}
-      <div className="u-stack-mobile u-no-gap-mobile" style={{ position: 'absolute', top: 20, left: 20, right: 20, zIndex: 1000, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
-        <h1 style={{ color: 'var(--primary)', textShadow: '0 2px 4px rgba(0,0,0,0.5)', fontSize: '1.5rem', fontWeight: 'bold' }}>Tripzo</h1>
-        <div style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={() => navigate('/wallet')} className="glass-panel" style={{ border: 'none', padding: '10px 15px', color: 'white', cursor: 'pointer', fontSize: '0.9rem' }}>
-                ₹{user?.walletBalance || 0}
-            </button>
-            <button onClick={() => { logout(); navigate('/login'); }} className="glass-panel" style={{ border: 'none', padding: '10px 15px', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
-                <LogOut size={16} /> <span className="u-hide-mobile">Logout</span>
-            </button>
+      <div className="u-container" style={{ position: 'absolute', top: 20, left: 0, right: 0, zIndex: 1000 }}>
+        <div className="u-flex-between u-stack-mobile u-no-gap-mobile" style={{ gap: '15px' }}>
+          <h1 style={{ color: 'var(--primary)', textShadow: '0 2px 8px rgba(0,0,0,0.8)', fontSize: '1.5rem', fontWeight: 'bold' }}>Tripzo</h1>
+          <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => navigate('/wallet')} className="glass-panel" style={{ border: 'none', padding: '10px 18px', color: 'white', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>
+                  ₹{user?.walletBalance || 0}
+              </button>
+              <button onClick={() => { logout(); navigate('/login'); }} className="glass-panel" style={{ border: 'none', padding: '10px 18px', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: '600' }}>
+                  <LogOut size={16} /> <span className="u-hide-mobile">Logout</span>
+              </button>
+          </div>
         </div>
       </div>
 
@@ -241,61 +243,61 @@ const Home = () => {
       />
 
       {paymentPhase && completedRide ? (
-        <div className="booking-panel glass-panel" style={{ border: '2px solid var(--primary)' }}>
-            <h3 style={{ color: 'var(--primary)', marginBottom: '20px', fontSize: '1.5rem' }}>Ride Completed!</h3>
-            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '12px', marginBottom: '20px', textAlign: 'center' }}>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '5px' }}>TOTAL FARE</p>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>₹{completedRide.fare}</h2>
+        <div className="booking-panel glass-panel" style={{ border: '2px solid var(--primary)', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h3 style={{ color: 'var(--primary)', marginBottom: '15px', fontSize: '1.4rem' }}>Ride Completed!</h3>
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '15px', borderRadius: '12px', marginBottom: '15px', textAlign: 'center' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '4px' }}>TOTAL FARE</p>
+                <h2 style={{ fontSize: '2.2rem', fontWeight: 'bold' }}>₹{completedRide.fare}</h2>
             </div>
             
-            <p style={{ marginBottom: '15px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Select Payment Method:</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <p style={{ marginBottom: '12px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Select Payment Method:</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <button 
                   onClick={() => handleProcessPayment('wallet')} 
                   className="btn-primary" 
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px' }}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px' }}
                 >
                     <span style={{ fontWeight: '600' }}>Wallet</span>
-                    <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>Balance: ₹{user?.walletBalance || 0}</span>
+                    <span style={{ fontSize: '0.75rem', opacity: 0.9 }}>Balance: ₹{user?.walletBalance || 0}</span>
                 </button>
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
                     <button 
                         onClick={() => setShowUPI(true)} 
                         className="glass-panel" 
-                        style={{ flex: 1, color: '#3b82f6', padding: '15px', border: '1px solid rgba(59, 130, 246, 0.2)', cursor: 'pointer', fontWeight: 'bold' }}
+                        style={{ flex: 1, color: '#3b82f6', padding: '14px', border: '1px solid rgba(59, 130, 246, 0.2)', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}
                     >
                         UPI
                     </button>
                     <button 
                         onClick={() => handleProcessPayment('cash')} 
                         className="glass-panel" 
-                        style={{ flex: 1, color: 'white', padding: '15px', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', fontWeight: 'bold' }}
+                        style={{ flex: 1, color: 'white', padding: '14px', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}
                     >
                         Cash
                     </button>
                 </div>
 
                 {showUPI && (
-                    <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6', borderRadius: '12px', padding: '20px', textAlign: 'center', marginTop: '10px', animation: 'fadeIn 0.3s ease' }}>
-                        <p style={{ color: '#3b82f6', fontSize: '0.8rem', marginBottom: '10px' }}>Scan the QR code to pay ₹{completedRide.fare}</p>
-                        <div style={{ width: '180px', height: '180px', background: 'white', margin: '0 auto 15px', padding: '10px', borderRadius: '12px' }}>
+                    <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6', borderRadius: '12px', padding: '15px', textAlign: 'center', marginTop: '10px', animation: 'slideDown 0.3s ease' }}>
+                        <p style={{ color: '#3b82f6', fontSize: '0.75rem', marginBottom: '10px' }}>Scan the QR code to pay ₹{completedRide.fare}</p>
+                        <div style={{ width: '150px', height: '150px', background: 'white', margin: '0 auto 12px', padding: '8px', borderRadius: '10px' }}>
                            <img 
                              src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`upi://pay?pa=9006145808-3@ybl&pn=Tripzo&am=${completedRide.fare}&cu=INR`)}`} 
                              alt="UPI QR Code" 
                              style={{ width: '100%', height: '100%' }}
                            />
                         </div>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '15px' }}>UPI ID: <strong>9006145808-3@ybl</strong></p>
+                        <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '12px' }}>UPI ID: <strong>9006145808-3@ybl</strong></p>
                         <button 
                             onClick={() => handleProcessPayment('upi')} 
                             className="btn-primary" 
-                            style={{ background: '#3b82f6', border: 'none', width: '100%' }}
+                            style={{ background: '#3b82f6', border: 'none', width: '100%', padding: '12px' }}
                         >
                             Confirm Payment
                         </button>
                         <button 
                             onClick={() => setShowUPI(false)} 
-                            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', marginTop: '10px', fontSize: '0.8rem', cursor: 'pointer' }}
+                            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', marginTop: '8px', fontSize: '0.75rem', cursor: 'pointer' }}
                         >
                             Cancel
                         </button>
@@ -305,33 +307,33 @@ const Home = () => {
         </div>
       ) : activeRide ? (
         <div className="booking-panel glass-panel" style={{ border: '1px solid var(--primary)' }}>
-            <h3 style={{ marginBottom: '16px', color: 'var(--primary)' }}>Ride In Progress</h3>
-            <div style={{ marginBottom: '20px' }}>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>STATUS</p>
+            <h3 style={{ marginBottom: '12px', color: 'var(--primary)', fontSize: '1.2rem' }}>Ride In Progress</h3>
+            <div style={{ marginBottom: '15px' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>STATUS</p>
                 <p style={{ fontWeight: 'bold', color: '#4ade80' }}>{activeRide.status.toUpperCase()}</p>
             </div>
             {activeRide.status === 'accepted' && (
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '15px', borderRadius: '8px', textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>SHARE THIS OTP WITH DRIVER</p>
-                    <h2 style={{ fontSize: '1.75rem', letterSpacing: '4px' }}>{activeRide.otp}</h2>
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>SHARE THIS OTP WITH DRIVER</p>
+                    <h2 style={{ fontSize: '1.6rem', letterSpacing: '4px', marginTop: '4px' }}>{activeRide.otp}</h2>
                 </div>
             )}
-            <div style={{ marginTop: '20px' }}>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>DESTINATION</p>
-                <p>{activeRide.destination}</p>
+            <div style={{ marginTop: '15px' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>DESTINATION</p>
+                <p style={{ fontSize: '0.9rem' }}>{activeRide.destination}</p>
             </div>
         </div>
       ) : (
-        <div className="booking-panel glass-panel">
-          <h3 style={{ marginBottom: '16px', fontSize: '1.25rem', fontWeight: '600' }}>Book a Ride</h3>
+        <div className="booking-panel glass-panel" style={{ maxHeight: '85vh', overflowY: 'auto' }}>
+          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', fontWeight: '600' }}>Book a Ride</h3>
           
           {errorMessage && (
-            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <span style={{ fontWeight: '500' }}>{errorMessage}</span>
                 {errorMessage.toLowerCase().includes('balance') && (
                     <button 
                         onClick={() => navigate('/wallet')} 
-                        style={{ background: '#ef4444', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', alignSelf: 'flex-start', fontWeight: 'bold' }}
+                        style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', alignSelf: 'flex-start', fontWeight: 'bold' }}
                     >
                         Top Up Wallet
                     </button>
@@ -359,10 +361,10 @@ const Home = () => {
                     listStyle: 'none', 
                     padding: '8px', 
                     marginTop: '8px', 
-                    maxHeight: '240px', 
+                    maxHeight: '200px', 
                     overflowY: 'auto',
                     border: '1px solid var(--primary)',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.6)'
                   }}>
                       {pSuggestions.map((s) => (
                           <li key={s.place_id} 
@@ -372,10 +374,10 @@ const Home = () => {
                                 setPSuggestions([]); 
                             }} 
                             style={{ 
-                              padding: '12px 16px', 
+                              padding: '12px 14px', 
                               cursor: 'pointer', 
                               borderBottom: '1px solid rgba(255,255,255,0.05)', 
-                              fontSize: '0.9rem',
+                              fontSize: '0.85rem',
                               borderRadius: '8px',
                               transition: 'background 0.2s ease',
                               marginBottom: '4px',
@@ -385,10 +387,10 @@ const Home = () => {
                               width: '100%',
                               backgroundColor: 'transparent'
                             }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(250, 204, 21, 0.15)'}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(250, 204, 21, 0.12)'}
                             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                           >
-                              <MapPin size={18} color="var(--primary)" style={{ flexShrink: 0 }} />
+                              <MapPin size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
                               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', pointerEvents: 'none' }}>{s.display_name}</span>
                           </li>
                       ))}
@@ -414,10 +416,10 @@ const Home = () => {
                     listStyle: 'none', 
                     padding: '8px', 
                     marginTop: '8px', 
-                    maxHeight: '240px', 
+                    maxHeight: '200px', 
                     overflowY: 'auto',
                     border: '1px solid var(--primary)',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.6)'
                   }}>
                       {dSuggestions.map((s) => (
                           <li key={s.place_id} 
@@ -427,10 +429,10 @@ const Home = () => {
                                 setDSuggestions([]); 
                             }} 
                             style={{ 
-                              padding: '12px 16px', 
+                              padding: '12px 14px', 
                               cursor: 'pointer', 
                               borderBottom: '1px solid rgba(255,255,255,0.05)', 
-                              fontSize: '0.9rem',
+                              fontSize: '0.85rem',
                               borderRadius: '8px',
                               transition: 'background 0.2s ease',
                               marginBottom: '4px',
@@ -440,10 +442,10 @@ const Home = () => {
                               width: '100%',
                               backgroundColor: 'transparent'
                             }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(250, 204, 21, 0.15)'}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(250, 204, 21, 0.12)'}
                             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                           >
-                              <Navigation size={18} color="var(--primary)" style={{ flexShrink: 0 }} />
+                              <Navigation size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
                               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', pointerEvents: 'none' }}>{s.display_name}</span>
                           </li>
                       ))}
@@ -451,21 +453,21 @@ const Home = () => {
               )}
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                <div onClick={() => setVehicleType('motorcycle')} className={`glass-panel ${vehicleType === 'motorcycle' ? 'active' : ''}`} style={{ flex: 1, padding: '10px', textAlign: 'center', cursor: 'pointer', border: vehicleType === 'motorcycle' ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)' }}>🏍️ Bike</div>
-                <div onClick={() => setVehicleType('auto')} className={`glass-panel ${vehicleType === 'auto' ? 'active' : ''}`} style={{ flex: 1, padding: '10px', textAlign: 'center', cursor: 'pointer', border: vehicleType === 'auto' ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)' }}>🛺 Auto</div>
-                <div onClick={() => setVehicleType('car')} className={`glass-panel ${vehicleType === 'car' ? 'active' : ''}`} style={{ flex: 1, padding: '10px', textAlign: 'center', cursor: 'pointer', border: vehicleType === 'car' ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)' }}>🚗 Car</div>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                <div onClick={() => setVehicleType('motorcycle')} className={`glass-panel ${vehicleType === 'motorcycle' ? 'active' : ''}`} style={{ flex: '1 1 80px', padding: '10px', textAlign: 'center', cursor: 'pointer', border: vehicleType === 'motorcycle' ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)', fontSize: '0.85rem' }}>🏍️ Bike</div>
+                <div onClick={() => setVehicleType('auto')} className={`glass-panel ${vehicleType === 'auto' ? 'active' : ''}`} style={{ flex: '1 1 80px', padding: '10px', textAlign: 'center', cursor: 'pointer', border: vehicleType === 'auto' ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)', fontSize: '0.85rem' }}>🛺 Auto</div>
+                <div onClick={() => setVehicleType('car')} className={`glass-panel ${vehicleType === 'car' ? 'active' : ''}`} style={{ flex: '1 1 80px', padding: '10px', textAlign: 'center', cursor: 'pointer', border: vehicleType === 'car' ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)', fontSize: '0.85rem' }}>🚗 Car</div>
             </div>
 
-            <button type="submit" className="btn-primary" disabled={isBooking}>
+            <button type="submit" className="btn-primary" disabled={isBooking} style={{ padding: '15px' }}>
               {isBooking ? 'Finding Nearest Driver...' : 'Request Tripzo'}
             </button>
           </form>
 
           {/* Persistent Recent Activity Section */}
-          <div style={{ marginTop: '30px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
-             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <h4 style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Recent Activity</h4>
+          <div style={{ marginTop: '25px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '15px' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h4 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600' }}>Recent Activity</h4>
                 <button 
                     onClick={() => {
                         const fetchHistory = async () => {
@@ -483,38 +485,38 @@ const Home = () => {
                     Refresh
                 </button>
              </div>
-             <div style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
+             <div style={{ maxHeight: '250px', overflowY: 'auto', paddingRight: '5px' }}>
                 <RideHistory rides={history} title={null} />
              </div>
           </div>
         </div>
       )}
 
-      {/* Rating Phase */}
+      {/* Rating Phase Overlay */}
       {ratingPhase && (
         <div style={{
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            zIndex: 1002,
-            width: '90%',
-            maxWidth: '400px'
+            zIndex: 1100,
+            width: '95%',
+            maxWidth: '380px'
         }}>
-            <div className="glass-panel" style={{ padding: '30px', textAlign: 'center' }}>
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Rate Your Trip</h2>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>How was your ride with {completedRide.captain?.fullname?.firstname}?</p>
+            <div className="glass-panel" style={{ padding: '25px', textAlign: 'center', boxShadow: '0 0 50px rgba(0,0,0,0.8)' }}>
+                <h2 style={{ fontSize: '1.4rem', marginBottom: '8px' }}>Rate Your Trip</h2>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '18px', fontSize: '0.9rem' }}>How was your ride with {completedRide.captain?.fullname?.firstname}?</p>
                 
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '18px' }}>
                     {[1, 2, 3, 4, 5].map((star) => (
                         <Star 
                             key={star}
-                            size={32}
+                            size={28}
                             fill={rating >= star ? "var(--primary)" : "none"}
                             color={rating >= star ? "var(--primary)" : "var(--text-muted)"}
                             style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
                             onClick={() => setRating(star)}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                         />
                     ))}
@@ -526,25 +528,26 @@ const Home = () => {
                     placeholder="Tell us more about your experience... (optional)"
                     style={{
                         width: '100%',
-                        height: '100px',
+                        height: '90px',
                         background: 'rgba(255,255,255,0.05)',
                         border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '12px',
+                        borderRadius: '10px',
                         padding: '12px',
                         color: 'white',
-                        marginBottom: '20px',
-                        resize: 'none'
+                        marginBottom: '18px',
+                        resize: 'none',
+                        fontSize: '0.9rem'
                     }}
                 />
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <button onClick={handleSubmitRating} className="btn-primary">Submit Rating</button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <button onClick={handleSubmitRating} className="btn-primary" style={{ padding: '14px' }}>Submit Rating</button>
                     <button 
                         onClick={() => {
                             setRatingPhase(false);
                             setCompletedRide(null);
                         }} 
-                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', padding: '10px', cursor: 'pointer' }}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', padding: '8px', cursor: 'pointer', fontSize: '0.85rem' }}
                     >
                         Skip for now
                     </button>
@@ -553,6 +556,7 @@ const Home = () => {
         </div>
       )}
     </div>
+
   );
 };
 

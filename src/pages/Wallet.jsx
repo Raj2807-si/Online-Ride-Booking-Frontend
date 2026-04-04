@@ -33,19 +33,19 @@ const Wallet = () => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', minHeight: '100vh' }}>
-      <h2 style={{ marginBottom: '20px' }}>Your Wallet</h2>
+    <div className="u-container u-py-80" style={{ minHeight: '100vh' }}>
+      <h2 className="u-title-mobile" style={{ marginBottom: '32px', fontWeight: 'bold' }}>Your Wallet</h2>
       
-      <div className="u-grid u-grid-2" style={{ marginBottom: '30px' }}>
-        <div className="glass-panel" style={{ padding: '30px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>Current Balance</p>
-          <h1 style={{ fontSize: '3rem', color: 'var(--primary)', marginBottom: '0' }}>₹{balance}</h1>
+      <div className="u-grid u-grid-2" style={{ marginBottom: '40px', gap: '24px' }}>
+        <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '12px', fontSize: '1rem' }}>Current Balance</p>
+          <h1 style={{ fontSize: '3.5rem', color: 'var(--primary)', marginBottom: '0', fontWeight: '800' }}>₹{balance}</h1>
         </div>
         
-        <div className="glass-panel" style={{ padding: '30px' }}>
-          <h3 style={{ marginBottom: '15px' }}>Top-up Wallet</h3>
-          <div className="input-group" style={{ marginBottom: '15px' }}>
-            <label className="input-label">Amount (₹)</label>
+        <div className="glass-panel" style={{ padding: '32px' }}>
+          <h3 style={{ marginBottom: '20px', fontSize: '1.3rem' }}>Top-up Wallet</h3>
+          <div className="input-group" style={{ marginBottom: '20px' }}>
+            <label className="input-label" style={{ fontSize: '0.85rem' }}>Amount (₹)</label>
             <input 
               type="number" 
               className="input-field" 
@@ -53,23 +53,28 @@ const Wallet = () => {
               onChange={(e) => setTopupAmount(e.target.value)}
               min="10"
               placeholder="Enter amount"
+              style={{ fontSize: '1.1rem', padding: '14px' }}
             />
           </div>
           <UPIPayment amount={topupAmount} upiId="9006145808-3@ybl" />
         </div>
       </div>
 
-      <div className="glass-panel" style={{ padding: '20px' }}>
-        <h3 style={{ marginBottom: '20px' }}>Transaction History</h3>
-        {loading ? <p>Loading...</p> : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {transactions.length === 0 ? <p>No transactions yet.</p> : transactions.map(t => (
-              <div key={t._id} style={{ display: 'flex', justifyContent: 'space-between', padding: '15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                <div>
-                  <p style={{ fontWeight: '600' }}>{t.description}</p>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(t.createdAt).toLocaleString()}</p>
+      <div className="glass-panel" style={{ padding: '24px' }}>
+        <h3 style={{ marginBottom: '24px', fontSize: '1.2rem', paddingLeft: '8px' }}>Transaction History</h3>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading transactions...</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {transactions.length === 0 ? (
+              <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>No transactions yet.</p>
+            ) : transactions.map(t => (
+              <div key={t._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ overflow: 'hidden' }}>
+                  <p style={{ fontWeight: '600', fontSize: '0.95rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.description}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(t.createdAt).toLocaleDateString()} • {new Date(t.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
-                <p style={{ color: t.transactionType === 'topup' ? '#4ade80' : '#f87171', fontWeight: 'bold' }}>
+                <p style={{ color: t.transactionType === 'topup' ? '#4ade80' : '#f87171', fontWeight: 'bold', fontSize: '1.1rem', flexShrink: 0, paddingLeft: '15px' }}>
                   {t.transactionType === 'topup' ? '+' : '-'} ₹{t.amount}
                 </p>
               </div>

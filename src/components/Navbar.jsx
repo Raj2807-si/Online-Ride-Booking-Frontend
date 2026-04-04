@@ -24,40 +24,40 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path ? { color: 'var(--primary)', fontWeight: 'bold' } : { color: 'white' };
 
   return (
-    <nav className="glass-panel" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, margin: '20px', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <nav className="glass-panel" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, margin: '15px', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <Link to="/" style={{ textDecoration: 'none' }}>
-        <h2 style={{ color: 'var(--primary)', fontSize: '1.8rem', fontWeight: 'bold', margin: 0 }}>Tripzo</h2>
+        <h2 style={{ color: 'var(--primary)', fontSize: '1.6rem', fontWeight: 'bold', margin: 0 }}>Tripzo</h2>
       </Link>
 
       {/* Desktop Navigation */}
-      <div className="nav-desktop" style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
-        <Link to="/" style={{ textDecoration: 'none', transition: 'color 0.2s', ...isActive('/') }}>Home</Link>
-        <Link to="/about" style={{ textDecoration: 'none', transition: 'color 0.2s', ...isActive('/about') }}>About</Link>
-        <Link to="/services" style={{ textDecoration: 'none', transition: 'color 0.2s', ...isActive('/services') }}>Services</Link>
-        <Link to="/contact" style={{ textDecoration: 'none', transition: 'color 0.2s', ...isActive('/contact') }}>Contact</Link>
+      <div className="nav-desktop" style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
+        <Link to="/" style={{ textDecoration: 'none', transition: 'color 0.2s', fontSize: '0.95rem', ...isActive('/') }}>Home</Link>
+        <Link to="/about" style={{ textDecoration: 'none', transition: 'color 0.2s', fontSize: '0.95rem', ...isActive('/about') }}>About</Link>
+        <Link to="/services" style={{ textDecoration: 'none', transition: 'color 0.2s', fontSize: '0.95rem', ...isActive('/services') }}>Services</Link>
+        <Link to="/contact" style={{ textDecoration: 'none', transition: 'color 0.2s', fontSize: '0.95rem', ...isActive('/contact') }}>Contact</Link>
       </div>
 
-      <div className="nav-desktop" style={{ display: 'flex', gap: '15px' }}>
+      <div className="nav-desktop" style={{ display: 'flex', gap: '12px' }}>
         {token ? (
           <div style={{ display: 'flex', gap: '12px' }}>
             <Link to={getDashboardPath()} style={{ textDecoration: 'none' }}>
-              <button className="btn-primary" style={{ padding: '10px 20px', width: 'auto', fontSize: '0.9rem' }}>
+              <button className="btn-primary" style={{ padding: '10px 18px', width: 'auto', fontSize: '0.85rem' }}>
                 Dashboard
               </button>
             </Link>
-            <button onClick={handleLogout} style={{ background: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+            <button onClick={handleLogout} style={{ background: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '10px 18px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.85rem' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
               Logout
             </button>
           </div>
         ) : (
           <>
             <Link to="/login" style={{ textDecoration: 'none' }}>
-              <button style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.borderColor = 'var(--primary)'} onMouseOut={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'}>
+              <button style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '10px 18px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.85rem' }} onMouseOver={e => e.currentTarget.style.borderColor = 'var(--primary)'} onMouseOut={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'}>
                 Login
               </button>
             </Link>
             <Link to="/signup" style={{ textDecoration: 'none' }}>
-              <button className="btn-primary" style={{ padding: '10px 20px', width: 'auto' }}>
+              <button className="btn-primary" style={{ padding: '10px 18px', width: 'auto', fontSize: '0.85rem' }}>
                 Sign Up
               </button>
             </Link>
@@ -66,41 +66,42 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Toggle Button */}
-      <button className="nav-mobile-btn" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? <X size={28} /> : <Menu size={28} />}
+      <button className="nav-mobile-btn" onClick={() => setIsOpen(!isOpen)} style={{ padding: '5px' }}>
+        {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
       {/* Mobile Menu */}
       {isOpen && (
         <div className="nav-mobile-menu">
-           <Link to="/" style={{ textDecoration: 'none', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', ...isActive('/') }} onClick={() => setIsOpen(false)}>Home</Link>
-           <Link to="/about" style={{ textDecoration: 'none', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', ...isActive('/about') }} onClick={() => setIsOpen(false)}>About</Link>
-           <Link to="/services" style={{ textDecoration: 'none', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', ...isActive('/services') }} onClick={() => setIsOpen(false)}>Services</Link>
-           <Link to="/contact" style={{ textDecoration: 'none', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', ...isActive('/contact') }} onClick={() => setIsOpen(false)}>Contact</Link>
+           <Link to="/" style={{ textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '1.1rem', ...isActive('/') }} onClick={() => setIsOpen(false)}>Home</Link>
+           <Link to="/about" style={{ textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '1.1rem', ...isActive('/about') }} onClick={() => setIsOpen(false)}>About</Link>
+           <Link to="/services" style={{ textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '1.1rem', ...isActive('/services') }} onClick={() => setIsOpen(false)}>Services</Link>
+           <Link to="/contact" style={{ textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '1.1rem', ...isActive('/contact') }} onClick={() => setIsOpen(false)}>Contact</Link>
 
-           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
+           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
               {token ? (
                 <>
                   <Link to={getDashboardPath()} style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
-                    <button className="btn-primary" style={{ width: '100%', padding: '12px 20px' }}>Dashboard</button>
+                    <button className="btn-primary" style={{ width: '100%', padding: '14px 20px' }}>Dashboard</button>
                   </Link>
-                  <button onClick={() => { handleLogout(); setIsOpen(false); }} style={{ width: '100%', background: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '12px 20px', borderRadius: '8px' }}>
+                  <button onClick={() => { handleLogout(); setIsOpen(false); }} style={{ width: '100%', background: 'transparent', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '14px 20px', borderRadius: '8px', cursor: 'pointer' }}>
                     Logout
                   </button>
                 </>
               ) : (
                 <>
                   <Link to="/login" style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
-                    <button style={{ width: '100%', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '12px 20px', borderRadius: '8px' }}>Login</button>
+                    <button style={{ width: '100%', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '14px 20px', borderRadius: '8px', cursor: 'pointer' }}>Login</button>
                   </Link>
                   <Link to="/signup" style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
-                    <button className="btn-primary" style={{ width: '100%', padding: '12px 20px' }}>Sign Up</button>
+                    <button className="btn-primary" style={{ width: '100%', padding: '14px 20px' }}>Sign Up</button>
                   </Link>
                 </>
               )}
            </div>
         </div>
       )}
+
     </nav>
   );
 };
