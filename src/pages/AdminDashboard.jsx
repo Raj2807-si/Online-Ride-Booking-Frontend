@@ -3,15 +3,17 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
-import { LayoutDashboard, UserCheck, Car, Settings } from 'lucide-react';
+import { LayoutDashboard, UserCheck, Car, Settings, Clock } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { token, role, logout } = useAuth();
   const [pendingDrivers, setPendingDrivers] = useState([]);
+  const [pendingRentals, setPendingRentals] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [fleet, setFleet] = useState([]);
   const [showAddVehicle, setShowAddVehicle] = useState(false);
+  const [activeTab, setActiveTab] = useState('drivers'); // 'drivers' or 'rentals'
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,6 +22,7 @@ const AdminDashboard = () => {
         return;
     }
     fetchPendingDrivers();
+    fetchPendingRentals();
     fetchFleet();
   }, [role, navigate]);
 
@@ -32,6 +35,15 @@ const AdminDashboard = () => {
         setLoading(false);
     } catch (err) { console.error('Error fetching drivers', err); setLoading(false); }
   };
+
+  const fetchPendingRentals = async () => {
+      try {
+          const response = await axios.get(`${API_BASE_URL}/api/vehicles/rentals/pending`, {
+              headers: { Authorization: `Bearer ${token}` }
+          });
+          setPendingRentals(response.data);
+      } catch (err) { console.error('Error fetching rentals', err); }
+  }
 
   const fetchFleet = async () => {
     try {
@@ -69,12 +81,35 @@ const AdminDashboard = () => {
     } catch (err) { alert('Error verifying driver'); }
   };
 
+  const handleApproveRental = async (id) => {
+      try {
+          await axios.post(`${API_BASE_URL}/api/vehicles/rentals/approve/${id}`, {}, {
+              headers: { Authorization: `Bearer ${token}` }
+          });
+          alert('Rental approved and vehicle released!');
+          fetchPendingRentals();
+          fetchFleet();
+      } catch (error) { alert('Error approving rental'); }
+  }
+
+  const handleRejectRental = async (id) => {
+      if (!window.confirm('Are you sure you want to reject this rental? The user will be refunded.')) return;
+      try {
+          await axios.post(`${API_BASE_URL}/api/vehicles/rentals/reject/${id}`, {}, {
+              headers: { Authorization: `Bearer ${token}` }
+          });
+          alert('Rental rejected and user refunded.');
+          fetchPendingRentals();
+          fetchFleet();
+      } catch (error) { alert('Error rejecting rental'); }
+  }
+
   return (
     <div className="dashboard-container u-stack-mobile">
       <div className="sidebar glass-panel">
         <div className="logo" style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '40px' }}>Tripzo Admin</div>
         <nav className="u-hide-mobile">
-          <div className="nav-item active"><LayoutDashboard size={20} /> Overview</div>
+          <div onClick={() => setActiveTab('drivers')} className={`nav-item ${activeTab === 'drivers' || activeTab === 'rentals' ? 'active' : ''}`} style={{ cursor: 'pointer' }}><LayoutDashboard size={20} /> Overview</div>
           <div className="nav-item"><UserCheck size={20} /> Verifications</div>
           <div className="nav-item"><Car size={20} /> Fleet</div>
           <div className="nav-item"><Settings size={20} /> System</div>
@@ -100,8 +135,8 @@ const AdminDashboard = () => {
             <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)' }}>{pendingDrivers.length}</div>
           </div>
           <div className="glass-panel" style={{ padding: '24px' }}>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '8px' }}>Active Rides</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: '800' }}>24</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '8px' }}>Pending Rentals</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fbbf24' }}>{pendingRentals.length}</div>
           </div>
           <div className="glass-panel" style={{ padding: '24px' }}>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '8px' }}>Total Revenue</div>
@@ -113,27 +148,64 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <section className="glass-panel" style={{ padding: '24px', marginBottom: '32px' }}>
-            <h3 style={{ marginBottom: '24px', fontSize: '1.2rem' }}>Driver Verification Queue</h3>
-            {loading ? <p style={{ textAlign: 'center', padding: '20px' }}>Loading queue...</p> : (
+        {/* Tab Switcher */}
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <button 
+                onClick={() => setActiveTab('drivers')}
+                style={{ padding: '12px 20px', background: 'none', border: 'none', color: activeTab === 'drivers' ? 'var(--primary)' : 'var(--text-muted)', borderBottom: activeTab === 'drivers' ? '2px solid var(--primary)' : 'none', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+                Driver Verifications ({pendingDrivers.length})
+            </button>
+            <button 
+                onClick={() => setActiveTab('rentals')}
+                style={{ padding: '12px 20px', background: 'none', border: 'none', color: activeTab === 'rentals' ? 'var(--primary)' : 'var(--text-muted)', borderBottom: activeTab === 'rentals' ? '2px solid var(--primary)' : 'none', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+                Rental Approvals ({pendingRentals.length})
+            </button>
+        </div>
+
+        {activeTab === 'drivers' ? (
+            <section className="glass-panel" style={{ padding: '24px', marginBottom: '32px' }}>
+                <h3 style={{ marginBottom: '24px', fontSize: '1.2rem' }}>Driver Verification Queue</h3>
+                {loading ? <p style={{ textAlign: 'center', padding: '20px' }}>Loading queue...</p> : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {pendingDrivers.length === 0 ? <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px' }}>No drivers currently awaiting verification.</p> : pendingDrivers.map(d => (
+                            <div key={d._id} className="u-stack-mobile u-flex-between" style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', gap: '15px' }}>
+                                <div>
+                                    <p style={{ fontWeight: '600', fontSize: '0.95rem', marginBottom: '4px' }}>{d.fullname?.firstname} {d.fullname?.lastname}</p>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{d.email} • {d.vehicle?.plate || 'No Plate'}</p>
+                                </div>
+                                <div style={{ display: 'flex', gap: '10px', width: '100%', justifyContent: 'flex-end' }} className="u-full-width-mobile">
+                                    {d.documents?.[0] && (
+                                        <button onClick={() => setSelectedDoc(d.documents[0].fileId)} className="glass-panel" style={{ fontSize: '0.8rem', padding: '8px 16px', flex: 1, textAlign: 'center' }}>Docs</button>
+                                    )}
+                                    <button onClick={() => handleVerify(d._id)} className="btn-primary" style={{ width: 'auto', padding: '8px 20px', fontSize: '0.8rem', flex: 1 }}>Approve</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </section>
+        ) : (
+            <section className="glass-panel" style={{ padding: '24px', marginBottom: '32px' }}>
+                <h3 style={{ marginBottom: '24px', fontSize: '1.2rem' }}>Vehicle Rental Approval Queue</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {pendingDrivers.length === 0 ? <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px' }}>No drivers currently awaiting verification.</p> : pendingDrivers.map(d => (
-                        <div key={d._id} className="u-stack-mobile u-flex-between" style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', gap: '15px' }}>
+                    {pendingRentals.length === 0 ? <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px' }}>No pending rentals to approve.</p> : pendingRentals.map(r => (
+                        <div key={r._id} className="u-stack-mobile u-flex-between" style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', gap: '15px' }}>
                             <div>
-                                <p style={{ fontWeight: '600', fontSize: '0.95rem', marginBottom: '4px' }}>{d.fullname?.firstname} {d.fullname?.lastname}</p>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{d.email} • {d.vehicle?.plate || 'No Plate'}</p>
+                                <p style={{ fontWeight: '600', fontSize: '0.95rem', marginBottom: '4px' }}>{r.user?.fullname?.firstname} {r.user?.fullname?.lastname}</p>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Vehicle: <strong>{r.vehicle?.name}</strong> • Duration: {r.duration} {r.durationType}</p>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--primary)', marginTop: '4px' }}>License: {r.user?.licenseNumber || 'NOT FOUND'}</p>
                             </div>
                             <div style={{ display: 'flex', gap: '10px', width: '100%', justifyContent: 'flex-end' }} className="u-full-width-mobile">
-                                {d.documents?.[0] && (
-                                    <button onClick={() => setSelectedDoc(d.documents[0].fileId)} className="glass-panel" style={{ fontSize: '0.8rem', padding: '8px 16px', flex: 1, textAlign: 'center' }}>Docs</button>
-                                )}
-                                <button onClick={() => handleVerify(d._id)} className="btn-primary" style={{ width: 'auto', padding: '8px 20px', fontSize: '0.8rem', flex: 1 }}>Approve</button>
+                                <button onClick={() => handleApproveRental(r._id)} className="btn-primary" style={{ width: 'auto', padding: '8px 24px', fontSize: '0.85rem', flex: 1 }}>Release Vehicle</button>
+                                <button onClick={() => handleRejectRental(r._id)} className="glass-panel" style={{ width: 'auto', padding: '8px 24px', fontSize: '0.85rem', flex: 1, border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171' }}>Reject</button>
                             </div>
                         </div>
                     ))}
                 </div>
-            )}
-        </section>
+            </section>
+        )}
 
         <section className="glass-panel" style={{ padding: '24px' }}>
             <div className="u-flex-between u-stack-mobile" style={{ marginBottom: '24px', gap: '15px' }}>
@@ -160,7 +232,7 @@ const AdminDashboard = () => {
                               <td style={{ padding: '16px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>{v.plate}</td>
                               <td style={{ padding: '16px', fontSize: '0.9rem' }}>₹{v.dailyRate}</td>
                               <td style={{ padding: '16px' }}>
-                                  <span style={{ padding: '4px 12px', background: v.status === 'available' ? 'rgba(74, 222, 128, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: v.status === 'available' ? '#4ade80' : '#f87171', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                                  <span style={{ padding: '4px 12px', background: (v.status === 'available' || v.status === 'booked') ? 'rgba(74, 222, 128, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: (v.status === 'available' || v.status === 'booked') ? '#4ade80' : '#f87171', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 'bold' }}>
                                       {v.status.toUpperCase()}
                                   </span>
                               </td>
@@ -186,13 +258,13 @@ const AdminDashboard = () => {
             padding: '0 10px',
             borderTop: '1px solid rgba(255,255,255,0.05)'
         }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: 'var(--primary)' }}>
+            <div onClick={() => setActiveTab('drivers')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: activeTab === 'drivers' ? 'var(--primary)' : 'var(--text-muted)' }}>
                 <LayoutDashboard size={20} />
-                <span style={{ fontSize: '0.7rem' }}>Panel</span>
+                <span style={{ fontSize: '0.7rem' }}>Drivers</span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
-                <UserCheck size={20} />
-                <span style={{ fontSize: '0.7rem' }}>Verify</span>
+            <div onClick={() => setActiveTab('rentals')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: activeTab === 'rentals' ? 'var(--primary)' : 'var(--text-muted)' }}>
+                <Clock size={20} />
+                <span style={{ fontSize: '0.7rem' }}>Rentals</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
                 <Car size={20} />

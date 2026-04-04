@@ -58,6 +58,19 @@ const Services = () => {
               Dedicated transportation solutions for businesses. Manage employee rides, logs, and billing with a single unified dashboard.
             </p>
           </div>
+
+          <div className="glass-panel" style={{ padding: '40px 30px', textAlign: 'center', border: '1.5px solid var(--primary)' }}>
+            <div style={{ backgroundColor: 'rgba(250, 204, 21, 0.1)', width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+              <Zap size={36} color="var(--primary)" />
+            </div>
+            <h3 style={{ fontSize: '1.4rem', marginBottom: '14px' }}>Self-Driving Rentals</h3>
+            <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.95rem' }}>
+              Rent a vehicle and drive yourself. Choose from our wide range of bikes, cars, and premium EVs for local or intercity travel.
+            </p>
+            <Link to="/self-driving" style={{ textDecoration: 'none', display: 'inline-block', marginTop: '20px', color: 'var(--primary)', fontWeight: 'bold' }}>
+              View Fleet →
+            </Link>
+          </div>
         </div>
         
         <div style={{ textAlign: 'center', padding: '40px 0' }}>

@@ -279,21 +279,14 @@ const Home = () => {
 
                 {showUPI && (
                     <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6', borderRadius: '12px', padding: '15px', textAlign: 'center', marginTop: '10px', animation: 'slideDown 0.3s ease' }}>
-                        <p style={{ color: '#3b82f6', fontSize: '0.75rem', marginBottom: '10px' }}>Scan the QR code to pay ₹{completedRide.fare}</p>
-                        <div style={{ width: '150px', height: '150px', background: 'white', margin: '0 auto 12px', padding: '8px', borderRadius: '10px' }}>
-                           <img 
-                             src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`upi://pay?pa=9006145808-3@ybl&pn=Tripzo&am=${completedRide.fare}&cu=INR`)}`} 
-                             alt="UPI QR Code" 
-                             style={{ width: '100%', height: '100%' }}
-                           />
-                        </div>
-                        <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '12px' }}>UPI ID: <strong>9006145808-3@ybl</strong></p>
+                        <p style={{ color: '#3b82f6', fontSize: '1rem', fontWeight: 'bold', marginBottom: '10px' }}>UPI Payment</p>
+                        <p style={{ color: 'white', fontSize: '0.85rem', marginBottom: '15px' }}>Please scan the QR code displayed on the Captain's screen to pay ₹{completedRide.fare}</p>
                         <button 
                             onClick={() => handleProcessPayment('upi')} 
                             className="btn-primary" 
                             style={{ background: '#3b82f6', border: 'none', width: '100%', padding: '12px' }}
                         >
-                            Confirm Payment
+                            I have paid
                         </button>
                         <button 
                             onClick={() => setShowUPI(false)} 
@@ -325,7 +318,15 @@ const Home = () => {
         </div>
       ) : (
         <div className="booking-panel glass-panel" style={{ maxHeight: '85vh', overflowY: 'auto' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', fontWeight: '600' }}>Book a Ride</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '600' }}>Book a Ride</h3>
+            <button 
+                onClick={() => navigate('/self-driving')} 
+                style={{ background: 'rgba(250, 204, 21, 0.1)', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '6px 14px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
+            >
+                Rent a Vehicle
+            </button>
+          </div>
           
           {errorMessage && (
             <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>

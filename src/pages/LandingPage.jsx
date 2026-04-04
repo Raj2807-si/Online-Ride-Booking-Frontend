@@ -89,6 +89,40 @@ const LandingPage = () => {
         </div>
       </div>
 
+      {/* Self-Driving Highlight */}
+      <div style={{ background: 'var(--bg-dark)', borderTop: '1px solid rgba(255,255,255,0.05)' }} className="u-py-100">
+        <div className="u-container">
+          <div className="u-stack-mobile u-flex" style={{ alignItems: 'center', gap: '60px' }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'inline-block', padding: '6px 12px', background: 'rgba(250,204,21,0.1)', color: 'var(--primary)', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '20px', border: '1px solid rgba(250,204,21,0.2)' }}>NEW SERVICE</div>
+              <h2 style={{ fontSize: '2.4rem', marginBottom: '24px' }}>Rent & <span style={{ color: 'var(--primary)' }}>Drive Yourself</span></h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '32px', lineHeight: '1.6' }}>
+                Don't need a captain? Rent one of our premium vehicles and take the wheel. Choose from top-tier sedans, rugged SUVs, or eco-friendly EVs for your next adventure.
+              </p>
+              <ul style={{ listStyle: 'none', padding: 0, marginBottom: '40px' }}>
+                {['No hidden charges', '24/7 Roadside assistance', 'Insurance covered', 'Flexible durations'].map((item, i) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', color: 'white', fontWeight: '500' }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'var(--primary)', color: 'black', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem' }}>✓</div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/self-driving" style={{ textDecoration: 'none' }}>
+                <button className="btn-primary" style={{ padding: '16px 36px' }}>Explore Fleet</button>
+              </Link>
+            </div>
+            <div style={{ flex: 1.2 }} className="u-hide-mobile">
+              <div className="glass-panel" style={{ padding: '20px', position: 'relative' }}>
+                <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=800" alt="Self Driving" style={{ width: '100%', borderRadius: '12px', display: 'block' }} />
+                <div style={{ position: 'absolute', bottom: '-20px', right: '-20px', padding: '20px', background: 'var(--primary)', color: 'black', borderRadius: '12px', fontWeight: 'bold', boxShadow: '0 10px 30px rgba(250,204,21,0.3)' }}>
+                  Starting at ₹150/hr
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
       <Footer />
     </>

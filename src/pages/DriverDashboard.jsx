@@ -37,6 +37,7 @@ const DriverDashboard = () => {
   const [paymentConfirmed, setPaymentConfirmed] = useState(null);
   const [history, setHistory] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [showQR, setShowQR] = useState(false);
   const activeRideRef = useRef(activeRide);
 
   useEffect(() => {
@@ -273,7 +274,22 @@ const DriverDashboard = () => {
                                     <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Total Fare</p>
                                     <h2 style={{ fontSize: '2.8rem', fontWeight: '800' }}>₹{activeRide.fare}</h2>
                                 </div>
-                                <button onClick={handleCompleteRide} className="btn-primary" style={{ padding: '14px' }}>Complete & Collect Fare</button>
+                                <div style={{ display: 'flex', gap: '12px' }}>
+                                    <button 
+                                        onClick={() => setShowQR(true)} 
+                                        className="glass-panel" 
+                                        style={{ flex: 1, color: 'var(--primary)', border: '1px solid var(--primary)', padding: '14px', fontWeight: 'bold' }}
+                                    >
+                                        Show QR
+                                    </button>
+                                    <button 
+                                        onClick={handleCompleteRide} 
+                                        className="btn-primary" 
+                                        style={{ flex: 2, padding: '14px' }}
+                                    >
+                                        Complete Trip
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -407,6 +423,36 @@ const DriverDashboard = () => {
           <span style={{ fontSize: '0.7rem' }}>Setup</span>
         </div>
       </div>
+      {/* QR Code Overlay */}
+      {showQR && activeRide && (
+        <div style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.9)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+        }}>
+            <div className="glass-panel" style={{ padding: '30px', textAlign: 'center', maxWidth: '400px', width: '100%', border: '1px solid var(--primary)' }}>
+                <h3 style={{ color: 'var(--primary)', marginBottom: '20px', fontSize: '1.4rem' }}>Payment QR Code</h3>
+                <div style={{ background: 'white', padding: '15px', borderRadius: '15px', marginBottom: '20px', display: 'inline-block' }}>
+                    <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`upi://pay?pa=9006145808-3@ybl&pn=Tripzo&am=${activeRide.fare}&cu=INR`)}`} 
+                        alt="UPI QR Code" 
+                        style={{ width: '220px', height: '220px' }}
+                    />
+                </div>
+                <div style={{ marginBottom: '24px' }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '4px' }}>TOTAL FARE</p>
+                    <h2 style={{ fontSize: '2.2rem', fontWeight: 'bold' }}>₹{activeRide.fare}</h2>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '24px' }}>Ask the rider to scan this code using any UPI app</p>
+                <button onClick={() => setShowQR(false)} className="btn-primary" style={{ width: '100%', padding: '14px' }}>Close QR Code</button>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
