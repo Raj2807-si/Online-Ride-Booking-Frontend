@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
-import { Car, Bike, Zap, Search, ArrowLeft, Info, Calendar, Clock, MapPin } from 'lucide-react';
+import { Car, Bike, Zap, Search, ArrowLeft, Info, Calendar, Clock, MapPin, RefreshCcw } from 'lucide-react';
 
 const SelfDriving = () => {
   const { token, user, updateUser } = useAuth();
@@ -17,7 +17,9 @@ const SelfDriving = () => {
   const [duration, setDuration] = useState(1);
   const [durationType, setDurationType] = useState('daily');
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [bookingError, setBookingError] = useState(null);
   const [licenseNumber, setLicenseNumber] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('wallet');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -84,9 +86,17 @@ const SelfDriving = () => {
         return;
     }
 
+    setBookingError(null);
+
     if (!user.licenseNumber) {
         const saved = await handleSaveLicense();
         if (!saved) return;
+    }
+
+    const price = calculatePrice(selectedVehicle);
+    if (paymentMethod === 'wallet' && (user?.walletBalance || 0) < price) {
+        setBookingError("Insufficient wallet balance. Please top-up or select another payment method.");
+        return;
     }
 
     setBookingLoading(true);
@@ -94,7 +104,8 @@ const SelfDriving = () => {
       const res = await axios.post(`${API_BASE_URL}/api/vehicles/book`, {
         vehicleId: selectedVehicle._id,
         duration,
-        durationType
+        durationType,
+        paymentMethod
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -103,7 +114,8 @@ const SelfDriving = () => {
       fetchVehicles(); 
       fetchMyRentals();
     } catch (error) {
-       alert(error.response?.data?.message || 'Error booking vehicle');
+       const msg = error.response?.data?.message || 'Error booking vehicle';
+       setBookingError(msg);
     } finally {
         setBookingLoading(false);
     }
@@ -247,33 +259,56 @@ const SelfDriving = () => {
 
             {/* My Rentals Section */}
             {myRentals.length > 0 && (
-                <section style={{ marginTop: '40px' }}>
-                    <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <Clock color="var(--primary)" /> Your Active & Pending Rentals
-                    </h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
+                <section style={{ marginTop: '60px', padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                        <h2 style={{ fontSize: '2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                            <Clock color="var(--primary)" size={28} /> Your Trip <span style={{ color: 'var(--primary)' }}>Center</span>
+                        </h2>
+                        <button 
+                            onClick={fetchMyRentals} 
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '10px 20px', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', transition: 'all 0.3s' }}
+                            onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.1)'}
+                            onMouseOut={(e) => e.target.style.background = 'rgba(255,255,255,0.05)'}
+                        >
+                            <RefreshCcw size={16} /> Refresh Status
+                        </button>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '25px' }}>
                         {myRentals.map(r => (
-                            <div key={r._id} className="glass-panel" style={{ padding: '20px', border: `1px solid ${statusStyles[r.status]?.color || 'rgba(255,255,255,0.1)'}` }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                                    <h4 style={{ fontWeight: 'bold' }}>{r.vehicle?.name}</h4>
+                            <div key={r._id} className="glass-panel" style={{ padding: '24px', position: 'relative', border: `1px solid ${statusStyles[r.status]?.color || 'rgba(255,255,255,0.1)'}`, overflow: 'hidden' }}>
+                                <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: statusStyles[r.status]?.color }}></div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                                    <div>
+                                        <h4 style={{ fontWeight: '800', fontSize: '1.2rem', marginBottom: '4px' }}>{r.vehicle?.name}</h4>
+                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <Calendar size={12} /> {new Date(r.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </p>
+                                    </div>
                                     <div style={{ 
-                                        padding: '4px 12px', 
+                                        padding: '6px 14px', 
                                         borderRadius: '100px', 
-                                        fontSize: '0.7rem', 
-                                        fontWeight: 'bold',
+                                        fontSize: '0.65rem', 
+                                        letterSpacing: '1px',
+                                        fontWeight: '900',
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '6px',
                                         background: statusStyles[r.status]?.background,
-                                        color: statusStyles[r.status]?.color
+                                        color: statusStyles[r.status]?.color,
+                                        border: `1px solid ${statusStyles[r.status]?.color}44`
                                     }}>
                                         {statusStyles[r.status]?.icon} {r.status.toUpperCase()}
                                     </div>
                                 </div>
-                                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                    <div>Duration: <strong>{r.duration} {r.durationType}</strong></div>
-                                    <div>Cost: <strong>₹{r.totalCost}</strong></div>
-                                    <div style={{ gridColumn: '1/-1' }}>Booked on: {new Date(r.createdAt).toLocaleDateString()}</div>
+                                <div style={{ marginBottom: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '12px' }}>
+                                        <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Duration</p>
+                                        <p style={{ fontWeight: 'bold', fontSize: '1rem' }}>{r.duration} {r.durationType}</p>
+                                    </div>
+                                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '12px' }}>
+                                        <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Amount Paid</p>
+                                        <p style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--primary)' }}>₹{r.totalCost}</p>
+                                    </div>
                                 </div>
                                 {r.status === 'pending' && (
                                     <button 
@@ -285,22 +320,49 @@ const SelfDriving = () => {
                                     </button>
                                 )}
                                 {r.status === 'active' && (
-                                    <button 
-                                        onClick={async () => {
-                                            try {
-                                                await axios.post(`${API_BASE_URL}/api/vehicles/rentals/complete/${r._id}`, {}, {
-                                                    headers: { Authorization: `Bearer ${token}` }
-                                                });
-                                                alert('Rental completed! Thank you.');
-                                                fetchMyRentals();
-                                                fetchVehicles();
-                                            } catch (err) { alert('Error completing rental'); }
-                                        }}
-                                        className="btn-primary" 
-                                        style={{ width: '100%', marginTop: '15px', padding: '10px', fontSize: '0.85rem' }}
-                                    >
-                                        Complete Rental & Return
-                                    </button>
+                                    <div style={{ marginTop: '15px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '15px' }}>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <p style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: 'bold', marginBottom: '4px', textTransform: 'uppercase' }}>Pick-up Point</p>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <p style={{ fontSize: '0.85rem' }}>{r.vehicle?.address || 'Tripzo Hub A'}</p>
+                                                <a 
+                                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.vehicle?.address || 'Tripzo Hub')}`} 
+                                                    target="_blank" rel="noreferrer"
+                                                    style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 'bold' }}
+                                                >
+                                                    View Map
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div style={{ marginBottom: '20px' }}>
+                                            <p style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: 'bold', marginBottom: '4px', textTransform: 'uppercase' }}>Captain Contact</p>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <p style={{ fontSize: '0.85rem' }}>{r.vehicle?.contactNumber || '+91 98765 43210'}</p>
+                                                <a 
+                                                    href={`tel:${r.vehicle?.contactNumber || '9876543210'}`}
+                                                    style={{ background: 'rgba(74, 222, 128, 0.1)', color: '#4ade80', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', textDecoration: 'none' }}
+                                                >
+                                                    Call Captain
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            onClick={async () => {
+                                                try {
+                                                    await axios.post(`${API_BASE_URL}/api/vehicles/rentals/complete/${r._id}`, {}, {
+                                                        headers: { Authorization: `Bearer ${token}` }
+                                                    });
+                                                    alert('Rental completed! Thank you.');
+                                                    fetchMyRentals();
+                                                    fetchVehicles();
+                                                } catch (err) { alert('Error completing rental'); }
+                                            }}
+                                            className="btn-primary" 
+                                            style={{ width: '100%', padding: '10px', fontSize: '0.85rem' }}
+                                        >
+                                            Complete Rental & Return
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         ))}
@@ -367,17 +429,53 @@ const SelfDriving = () => {
                       </div>
                   </div>
 
-                  <div className="glass-panel" style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', marginBottom: '25px', textAlign: 'center' }}>
-                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>TOTAL ESTIMATE</p>
-                      <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary)' }}>₹{calculatePrice(selectedVehicle)}</h2>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '8px' }}>Balance: ₹{user?.walletBalance || 0}</p>
+                  <div style={{ marginBottom: '25px' }}>
+                      <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>PAYMENT METHOD</label>
+                      <select 
+                          value={paymentMethod}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                          className="input-field"
+                          style={{ colorScheme: 'dark', backgroundColor: 'rgba(0,0,0,0.5)', color: 'white' }}
+                      >
+                          <option value="wallet" style={{ backgroundColor: '#1a1a1a', color: 'white' }}>Tripzo Wallet (₹{user?.walletBalance || 0})</option>
+                          <option value="card" style={{ backgroundColor: '#1a1a1a', color: 'white' }}>Credit / Debit Card</option>
+                          <option value="upi" style={{ backgroundColor: '#1a1a1a', color: 'white' }}>UPI</option>
+                          <option value="netbanking" style={{ backgroundColor: '#1a1a1a', color: 'white' }}>Net Banking</option>
+                          <option value="cash" style={{ backgroundColor: '#1a1a1a', color: 'white' }}>Cash on Pick-up</option>
+                      </select>
                   </div>
 
+                  <div className="glass-panel" style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', marginBottom: '25px', textAlign: 'center', border: (paymentMethod === 'wallet' && (user?.walletBalance || 0) < calculatePrice(selectedVehicle)) ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(255,255,255,0.05)' }}>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>TOTAL ESTIMATE</p>
+                      <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary)' }}>₹{calculatePrice(selectedVehicle)}</h2>
+                      {paymentMethod === 'wallet' && (
+                          <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                              <p style={{ fontSize: '0.8rem', color: (user?.walletBalance || 0) < calculatePrice(selectedVehicle) ? '#f87171' : 'var(--text-muted)' }}>
+                                Balance: ₹{user?.walletBalance || 0}
+                              </p>
+                              {(user?.walletBalance || 0) < calculatePrice(selectedVehicle) && (
+                                  <button 
+                                    onClick={() => navigate('/wallet')} 
+                                    style={{ background: 'var(--primary)', color: 'black', border: 'none', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold', cursor: 'pointer' }}
+                                  >
+                                      TOP UP
+                                  </button>
+                              )}
+                          </div>
+                      )}
+                  </div>
+
+                  {bookingError && (
+                      <div style={{ color: '#f87171', background: 'rgba(239, 68, 68, 0.1)', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                          <Info size={16} /> {bookingError}
+                      </div>
+                  )}
+
                   <div style={{ display: 'flex', gap: '12px' }}>
-                      <button onClick={handleBook} disabled={bookingLoading} className="btn-primary" style={{ flex: 2, padding: '16px' }}>
+                      <button onClick={handleBook} disabled={bookingLoading} className="btn-primary" style={{ flex: 2, padding: '16px', opacity: bookingLoading ? 0.7 : 1 }}>
                           {bookingLoading ? 'Processing...' : 'Confirm Rental'}
                       </button>
-                      <button onClick={() => setSelectedVehicle(null)} className="glass-panel" style={{ flex: 1, cursor: 'pointer' }}>Cancel</button>
+                      <button onClick={() => { setSelectedVehicle(null); setBookingError(null); }} className="glass-panel" style={{ flex: 1, cursor: 'pointer' }}>Cancel</button>
                   </div>
               </div>
           </div>

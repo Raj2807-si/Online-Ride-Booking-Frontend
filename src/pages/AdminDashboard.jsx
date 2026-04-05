@@ -12,6 +12,7 @@ const AdminDashboard = () => {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [fleet, setFleet] = useState([]);
+  const [stats, setStats] = useState({ totalRevenue: 0, pendingDriversCount: 0, pendingRentalsCount: 0, totalFleetCount: 0 });
   const [showAddVehicle, setShowAddVehicle] = useState(false);
   const [activeTab, setActiveTab] = useState('drivers'); // 'drivers' or 'rentals'
   const navigate = useNavigate();
@@ -24,7 +25,17 @@ const AdminDashboard = () => {
     fetchPendingDrivers();
     fetchPendingRentals();
     fetchFleet();
+    fetchStats();
   }, [role, navigate]);
+
+  const fetchStats = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/api/vehicles/rentals/stats`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        setStats(response.data);
+    } catch (err) { console.error('Error fetching stats', err); }
+  };
 
   const fetchPendingDrivers = async () => {
     try {
@@ -68,6 +79,7 @@ const AdminDashboard = () => {
         alert('Vehicle added to fleet!');
         setShowAddVehicle(false);
         fetchFleet();
+        fetchStats();
     } catch (err) { alert('Error adding vehicle'); }
   };
 
@@ -89,6 +101,7 @@ const AdminDashboard = () => {
           alert('Rental approved and vehicle released!');
           fetchPendingRentals();
           fetchFleet();
+          fetchStats();
       } catch (error) { alert('Error approving rental'); }
   }
 
@@ -132,19 +145,19 @@ const AdminDashboard = () => {
         <div className="u-grid u-grid-4" style={{ marginBottom: '40px', gap: '20px' }}>
           <div className="glass-panel" style={{ padding: '24px' }}>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '8px' }}>Pending Drivers</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)' }}>{pendingDrivers.length}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)' }}>{stats.pendingDriversCount}</div>
           </div>
           <div className="glass-panel" style={{ padding: '24px' }}>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '8px' }}>Pending Rentals</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fbbf24' }}>{pendingRentals.length}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fbbf24' }}>{stats.pendingRentalsCount}</div>
           </div>
           <div className="glass-panel" style={{ padding: '24px' }}>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '8px' }}>Total Revenue</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: '800' }}>₹45,200</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '800' }}>₹{stats.totalRevenue.toLocaleString()}</div>
           </div>
           <div className="glass-panel" style={{ padding: '24px' }}>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '8px' }}>Fleet Vehicles</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: '800' }}>{fleet.length}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '800' }}>{stats.totalFleetCount}</div>
           </div>
         </div>
 
@@ -194,6 +207,7 @@ const AdminDashboard = () => {
                         <div key={r._id} className="u-stack-mobile u-flex-between" style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', gap: '15px' }}>
                             <div>
                                 <p style={{ fontWeight: '600', fontSize: '0.95rem', marginBottom: '4px' }}>{r.user?.fullname?.firstname} {r.user?.fullname?.lastname}</p>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>{r.user?.email}</p>
                                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Vehicle: <strong>{r.vehicle?.name}</strong> • Duration: {r.duration} {r.durationType}</p>
                                 <p style={{ fontSize: '0.75rem', color: 'var(--primary)', marginTop: '4px' }}>License: {r.user?.licenseNumber || 'NOT FOUND'}</p>
                             </div>

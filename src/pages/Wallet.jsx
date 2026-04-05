@@ -56,7 +56,7 @@ const Wallet = () => {
               style={{ fontSize: '1.1rem', padding: '14px' }}
             />
           </div>
-          <UPIPayment amount={topupAmount} upiId="9006145808-3@ybl" />
+          <UPIPayment amount={topupAmount} onPaymentSuccess={fetchWalletData} upiId="9006145808-3@ybl" />
         </div>
       </div>
 

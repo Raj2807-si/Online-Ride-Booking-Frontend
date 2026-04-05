@@ -16,6 +16,8 @@ const Signup = () => {
   const [vehiclePlate, setVehiclePlate] = useState('');
   const [vehicleCapacity, setVehicleCapacity] = useState('');
   const [vehicleType, setVehicleType] = useState('car');
+  const [serviceType, setServiceType] = useState('with-driver');
+  const [currentLocation, setCurrentLocation] = useState('');
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,6 +45,8 @@ const Signup = () => {
           capacity: Number(vehicleCapacity),
           vehicleType
         };
+        payload.serviceType = serviceType;
+        payload.currentLocation = currentLocation;
       }
 
       const response = await axios.post(endpoint, payload);
@@ -162,6 +166,20 @@ const Signup = () => {
                      <option value="motorcycle">Motorcycle</option>
                      <option value="auto">Auto Rikshaw</option>
                    </select>
+                </div>
+              </div>
+              <h4 style={{ marginBottom: '16px', marginTop: '16px', color: 'var(--primary)' }}>Service Preferences</h4>
+              <div className="form-row">
+                <div className="input-group" style={{ flex: 1 }}>
+                   <label className="input-label">Service Provided</label>
+                   <select className="input-field" value={serviceType} onChange={e => setServiceType(e.target.value)} required style={{ background: 'var(--bg-card)' }}>
+                     <option value="with-driver">Chauffeur (Provide Ride with Driver)</option>
+                     <option value="self-driving">Self-Driving (Provide Vehicle for Rental)</option>
+                   </select>
+                </div>
+                <div className="input-group" style={{ flex: 1 }}>
+                   <label className="input-label">Current Location / City</label>
+                   <input type="text" className="input-field" placeholder="e.g. Bangalore, Indiranagar" value={currentLocation} onChange={e => setCurrentLocation(e.target.value)} required />
                 </div>
               </div>
             </div>
